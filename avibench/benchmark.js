@@ -1,7 +1,10 @@
+// TODO: compile results into json and pass to submit.php
+
 var taskQueue = new Array();
-var outputDiv = document.createElement("div");
 var outputHtml = "";
 var running = false;
+var totalTasks;
+var completedTasks = 0;
 
 // append text to the output div
 function output(arg) {
@@ -13,14 +16,22 @@ function queue(name, fn, sleep) {
     taskQueue.push([name, fn, sleep]);
 }
 
-// recursive function that iterates over the task queue
+// recursive function that iterates over the task queue and gives feedback
 function runNextTask() {
+    if (! totalTasks) {
+        totalTasks = taskQueue.length
+    }
+
     var currentTask = taskQueue.shift();
     var delay = currentTask[2];
     if (! delay) {
         delay = 50;
     }
-    document.getElementById("status").innerHTML = ("running task: " + currentTask[0]);
+
+    document.getElementById("status").innerHTML = ("Running task: " + currentTask[0] + "<br><br>");
+    completedTasks++;
+    document.getElementById("progressBarFg").style.width = completedTasks/totalTasks*100 + "%";
+
     setTimeout(function() {
         currentTask[1]();
         if (taskQueue.length > 0) {
@@ -42,34 +53,39 @@ function summary(array) {
 }
 
 function main() {
+
+    // first, queue all tasks
     
     // blank loop
     var iterations = 100000000;
     var rep = 20;
-    var blankLoopAvg;
-    var blankLoopTrials = new Array();
-    output(iterations + " blank loops (ms)");
+    var incrementAvg;
+    var incrementTrials = new Array();
     for (run = 0; run < rep; run++) {
-        queue(iterations + " blank loops, trial #" + (run + 1), function() {
+        queue(iterations + " increments, trial #" + (run + 1), function() {
             var start = Date.now();
-            for (i = 0; i < iterations; i++);
+            var x = 0;
+            for (i = 0; i < iterations; i++) {
+                x++;
+            }
             var dt = (Date.now() - start);
-            blankLoopTrials.push(dt);
+            incrementTrials.push(dt);
         }, 100);
     }
-    queue("collecting blankLoop results", function() {
-        summary(blankLoopTrials);
+    queue("Collecting increment results", function() {
+        output(iterations + " increments (ms)");
+        summary(incrementTrials);
     });
 
     // display results
-    queue("collecting results", function() {
-        output("<br>finished");
+    queue("Collecting results", function() {
+        document.getElementById("output").innerHTML = outputHtml;
 
-        outputDiv.innerHTML = outputHtml;
-        document.body.appendChild(outputDiv);
-        document.getElementById("status").innerHTML = "tests finished; the results are displayed below. <br>please click the button when you are done reviewing them.";
+        document.getElementById("progressBarBg").style.height = "0px";
+        document.getElementById("status").innerHTML = "Tests finished. The results are displayed below. <br>Please click the button when you are done reviewing them.";
         
-        document.getElementById("button").innerHTML = "click here to submit your results (does nothing yet)";
+        document.getElementById("button").innerHTML = "Click here to submit your results (does nothing yet)";
+        document.getElementById("button").removeAttribute("style");
         document.getElementById("button").onclick = function() {
             window.location = "/submit.php";
         }
@@ -82,8 +98,9 @@ function main() {
 document.getElementById("button").onclick = function() {
     if (running == false) {
         running = true;
-        document.getElementById("button").innerHTML = "working...";
-        document.getElementById("status").innerHTML = "please wait... (running tests, please do not leave or refresh the page. your browser may appear to be frozen for a few minutes.)<br>";
+        document.getElementById("button").style = "visibility: hidden;";
+        document.getElementById("progressBarBg").style.height = "50px";
+        document.getElementById("status").innerHTML = "Setting up...<br><br>";
         setTimeout(main,500);
     }
 }

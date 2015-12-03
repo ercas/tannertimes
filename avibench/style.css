@@ -1,0 +1,24 @@
+body, button {
+    font-size: 40px;
+}
+body {
+    background-image: url("background.png");
+    background-repeat: repeat;
+}
+button {
+    padding: 20px;
+    width: 100%;
+}
+#output {
+    font-size: 30px;
+}
+#progressBarBg {
+    height: 0px;
+    width: 100%;
+    background: #f0f0f0;
+}
+#progressBarFg {
+    height: 100%;
+    width: 0%;
+    background: #2b6ca3;
+}

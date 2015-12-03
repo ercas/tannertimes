@@ -2,21 +2,21 @@
     <head>
         <meta charset=UTF-8>
         <title>test</title>
-        <style>
-            body, button {
-                font-size: 40px;
-            }
-            button {
-                padding: 20px;
-            }
-        </style>
+        <link rel=stylesheet type=text/css href=style.css>
     </head>
     <body>
+        <img src=header.png style="display: block; margin: 0 auto;">
+        <br>
         <div id=status>
-            click the button below to begin the test.
-            <br>your browser may appear to be frozen for a few or minutes while the test runs; please do not leave the page.
+            Thank you for choosing to participate in the smartphone study! Click the button below to begin the automated testing.
+            <br>
+            <br> Please do not leave or refresh the page while the test is running.
         </div>
-        <br><button id="button" type="button">start</button>
+        <div id=progressBarBg>
+            <div id=progressBarFg></div>
+        </div>
+        <br><button id="button" type="button">Start</button>
+        <div id=output></div>
         <script src=benchmark.js></script>
     </body>
 </html>
