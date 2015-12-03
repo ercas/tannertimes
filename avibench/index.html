@@ -12,55 +12,11 @@
         </style>
     </head>
     <body>
-        click the button below to begin the test.
-        <br>your browser may appear to be frozen for a few seconds while the test runs; please do not leave the page.
-        <br>
-        <br><button id="start" type="button">start</button>
-        <script>
-            <!-- TODO: set up a framework to accept a function as an argument and run tests with it -->
-            
-            function main() {
-                
-                var outputDiv = document.createElement("div");
-                var outputHtml = "";
-                function output(arg) {
-                    outputHtml += arg;
-                }
-
-                <!-- addition -->
-                var i = 100000000;
-                var rep = 20;
-                var sum = 0;
-                output("increment (" + i + " iterations)");
-                for (run = 0; run < rep; run++) {
-                    var start = Date.now();
-                    var x = 0;
-                    for (_i = 0; _i < i; _i++) {
-                        x++;
-                    }
-                    var dt = (Date.now() - start);
-                    output("<br>trial #" + run + ": " + dt + " ms");
-                    sum = sum + dt;
-                }
-                output("<br>average: " + (sum/rep) + " ms");
-
-                <!-- display results -->
-                output("<br><br>finished");
-                output('<br><button id="submit" type="button">click here to submit your results (does nothing yet)</button>');
-
-                outputDiv.innerHTML = outputHtml;
-                document.body.appendChild(outputDiv);
-                document.getElementById("status").innerHTML = "tests finished; the results are displayed below. <br>please click the button at the bottom of the page when you are done reviewing them.";
-
-                document.getElementById("submit").onclick = function() {
-                    window.location = "/submit.php";
-                }
-            }
-
-            document.getElementById("start").onclick = function() {
-                document.body.innerHTML = "<div id=status>please wait... (running tests, please do not leave or refresh the page)</div><br>";
-                setTimeout(main,500);
-            }
-        </script>
+        <div id=status>
+            click the button below to begin the test.
+            <br>your browser may appear to be frozen for a few or minutes while the test runs; please do not leave the page.
+        </div>
+        <br><button id="button" type="button">start</button>
+        <script src=benchmark.js></script>
     </body>
 </html>
