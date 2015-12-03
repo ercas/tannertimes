@@ -1,24 +1,48 @@
-body, button {
-    font-size: 40px;
-}
+/*
+light blue: #b6d3dd
+blue: #2b6ca3
+grey: #f0f0f0
+*/
 body {
     background-image: url("background.png");
     background-repeat: repeat;
+    font-size: 40px;
+    margin: 30px;
+    border: 0px;
+    padding: 0px;
 }
-button {
+button, #submit {
+    border-radius: 20px;
+    border-width: 5px;
+    font-size: inherit;
+    color: #2b6ca3;
     padding: 20px;
     width: 100%;
 }
-#output {
-    font-size: 30px;
+code {
+    display: inline-block;
+    font-size: 20px;
+    overflow: scroll;
+    width: 100%;
+}
+pre {
+    background: #f0f0f0;
+    padding: 20px;
+}
+#footer {
+    font-family: Arial;
+    font-size: 20px;
+    text-align: right;
 }
 #progressBarBg {
+    background: #f0f0f0;
+    border-radius: 10px;
     height: 0px;
     width: 100%;
-    background: #f0f0f0;
 }
 #progressBarFg {
+    background: #2b6ca3;
+    border-radius: 10px;
     height: 100%;
     width: 0%;
-    background: #2b6ca3;
 }

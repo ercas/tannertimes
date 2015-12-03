@@ -125,10 +125,12 @@ function main() {
         document.getElementById("status").innerHTML = "Tests finished. The results are displayed below. <br>Please click the button when you are done reviewing them.";
         
         document.getElementById("button").innerHTML = "Click here to submit your results (does nothing yet)";
+        document.getElementById("button").removeAttribute("style");
 
-        // reveal form
-        document.getElementById("results").innerHTML = outputText;
-        document.getElementById("form").removeAttribute("style");
+        // TODO: pass json to submit.php
+        document.getElementById("button").onclick = function() {
+            window.location = "/submit.php";
+        }
     });
     
     // run all queued tasks

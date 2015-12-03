@@ -5,18 +5,40 @@
         <link rel=stylesheet type=text/css href=style.css>
     </head>
     <body>
-        <img src=header.png style="display: block; margin: 0 auto;">
+        <a target=_blank href=http://thetannertimes.net><img src=header.png style="display: block; margin: 0 auto;"></a>
         <br>
+        <div style="color: red; text-align: center;">STILL A WORK IN PROGRESS<br><br></div>
         <div id=status>
             Thank you for choosing to participate in the smartphone study! Click the button below to begin the automated testing.
             <br>
             <br> Please do not leave or refresh the page while the test is running.
+            <br>
+            <br>
         </div>
+
+        <form id=form action=submit.php method=post style="display: none;">
+            <br>
+            <textarea id=results name=results readonly style="display: none;">test</textarea>
+            <input id=submit type=submit value="Submit results">
+        </form>
+
         <div id=progressBarBg>
             <div id=progressBarFg></div>
         </div>
-        <br><button id="button" type="button">Start</button>
-        <div id=output></div>
+
+        <button id="button" type="button">Loading resources...</button>
+
+        <pre id="outputBox" style="display: none;"><code id=output></code></pre>
+
+        <div id=footer>
+            <br>
+            <br>The source code for this project is available on <a target=_blank href=http://github.com/ercas/tannertimes/tree/master/avibench>GitHub</a>.
+        </div>
+
+        <script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/2.4.2/math.min.js></script>
+        <script>
+            document.getElementById("button").innerHTML = "Start";
+        </script>
         <script src=benchmark.js></script>
     </body>
 </html>
