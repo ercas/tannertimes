@@ -1,16 +1,16 @@
-// TODO: compile results into json and pass to submit.php
-
 var taskQueue = new Array();
-var outputText = "test results";
+var outputText = "test results\n    all measurements are in milliseconds unless otherwise specified";
 var running = false;
 var totalTasks;
 var completedTasks = 0;
 
 // append text to the output div
 function output(arg,header) {
-    outputText += "<br>";
+    outputText += "\n";
     if (header)
-        outputText += "<br>    task: ";
+        outputText += "\ntask: ";
+    else
+        outputText += "    ";
     outputText += arg;
 }
 
@@ -28,7 +28,7 @@ function runNextTask() {
     var currentTask = taskQueue.shift();
     var delay = currentTask[2];
     if (! delay) {
-        delay = 50;
+        delay = 100;
     }
 
     document.getElementById("status").innerHTML = ("Running task: " + currentTask[0] + "<br><br>");
@@ -61,12 +61,12 @@ function main() {
 
     // dump browser info
     queue("Dumping browser information", function() {
-        output("browser information",true);
+        output("browser information dump",true);
         output("user-agent: " + navigator.userAgent);
     });
     
     // blank loop
-    var incrementIterations = 100000000;
+    var incrementIterations = 10000000;
     var incrementReps = 16;
     var incrementAvg;
     var incrementTrials = new Array();
@@ -88,23 +88,13 @@ function main() {
     });
 
     // factorial
-    var factorialArg = 4096;
+    var factorialArg = 2048;
     var factorialReps = 10;
     var factorialAvg;
     var factorialTrials = new Array();
     for (run = 0; run < factorialReps; run++) {
         queue(factorialArg + "!, trial #" + (run + 1), function() {
             var start = Date.now();
-            /*
-            function factorial(x) {
-                if (x == 0) {
-                    return 1;
-                } else {
-                    return x * factorial(x-1);
-                }
-            }
-            console.log(factorialArg + "!: " + factorial(factorialArg));
-            */
             math.config({precision:14000});
             console.log(factorialArg + "!: " + math.factorial(math.bignumber(factorialArg)));
             var dt = (Date.now() - start);
@@ -122,11 +112,11 @@ function main() {
         document.getElementById("outputBox").removeAttribute("style");
 
         document.getElementById("progressBarBg").style.height = "0px";
-        document.getElementById("status").innerHTML = "Tests finished. The results are displayed below. <br>Please click the button when you are done reviewing them.";
+        document.getElementById("status").innerHTML = "Tests finished. Please enter any additional information that you'd like to provide into the box below (browser, phone model, how your day is going, etc.) and click the button when finished. The more information, the better! <br><br>The results of your test can be found below the button.";
         
         document.getElementById("button").innerHTML = "Click here to submit your results (does nothing yet)";
 
-        // reveal form
+        // modify and display the form
         document.getElementById("results").innerHTML = outputText;
         document.getElementById("form").removeAttribute("style");
     });

@@ -1,13 +1,14 @@
 <html>
     <head>
         <meta charset=UTF-8>
-        <title>test</title>
+        <title>The Tanner Times Phone Study</title>
+        <link rel=icon type=image/png href=favicon.png sizes=32x32>
         <link rel=stylesheet type=text/css href=style.css>
     </head>
     <body>
-        <a target=_blank href=http://thetannertimes.net><img src=header.png style="display: block; margin: 0 auto;"></a>
+        <a target=_blank href=http://thetannertimes.net><img id=header src=header.png></a>
         <br>
-        <div style="color: red; text-align: center;">STILL A WORK IN PROGRESS<br><br></div>
+        <div class=error>WORK IN PROGRESS - UNDER DEVELOPMENT<br><br></div>
         <div id=status>
             Thank you for choosing to participate in the smartphone study! Click the button below to begin the automated testing.
             <br>
@@ -15,11 +16,13 @@
             <br>
             <br>
         </div>
-
+        
+        <!-- please do not edit this information with inspect element or whatnot -->
         <form id=form action=submit.php method=post style="display: none;">
-            <br>
             <textarea id=results name=results readonly style="display: none;">test</textarea>
-            <input id=submit type=submit value="Submit results">
+            <br><textarea id=commentsField name=comments></textarea>
+            <br>
+            <br><input id=submit type=submit value="Submit results">
         </form>
 
         <div id=progressBarBg>
