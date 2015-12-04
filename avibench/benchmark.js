@@ -1,8 +1,10 @@
-var taskQueue = new Array();
-var outputText = "test results\n    all measurements are in milliseconds unless otherwise specified";
-var running = false;
-var totalTasks;
 var completedTasks = 0;
+var taskQueue = new Array();
+var totalTasks;
+
+var outputText = "test results\n    all measurements are in milliseconds unless otherwise specified";
+
+var running = false;
 
 // append text to the output div
 function output(arg,header) {
@@ -12,6 +14,33 @@ function output(arg,header) {
     else
         outputText += "    ";
     outputText += arg;
+}
+
+// print summary statistics and extra data of an array of numbers
+function summary(array) {
+    var n = array.length;
+    array.sort(function(a,b) {
+        return a - b;
+    });
+
+    var sum = 0;
+    for (i = 0; i < n; i++) {
+        sum += array[i];
+    }
+
+    var median;
+    var half = Math.floor(n/2);
+    if (n % 2 == 1) {
+        median = array[half];
+    } else {
+        median = (array[half]+array[half-1])/2;
+    }
+
+    output("items: " + array.join(", "));
+    output("n: " + n);
+    output("sum: " + sum);
+    output("mean: " + sum/n);
+    output("median: " + median);
 }
 
 // add a table consisting of a function and its sleep time to the task queue
@@ -28,7 +57,7 @@ function runNextTask() {
     var currentTask = taskQueue.shift();
     var delay = currentTask[2];
     if (! delay) {
-        delay = 100;
+        delay = 50;
     }
 
     document.getElementById("status").innerHTML = ("Running task: " + currentTask[0] + "<br>The page may appear to be frozen; please do not refresh or leave.<br><br>");
@@ -43,18 +72,6 @@ function runNextTask() {
     }, delay);
 }
 
-// print summary statistics and extra data of an array of numbers
-function summary(array) {
-    var n = array.length;
-    var sum = 0;
-    for (i = 0; i < n; i++) {
-        sum += array[i];
-    }
-    output("items: " + array.join(", "));
-    output("n: " + n);
-    output("mean: " + sum/n);
-}
-
 function main() {
 
     // first, queue all tasks
@@ -65,9 +82,9 @@ function main() {
         output("user-agent: " + navigator.userAgent);
     });
     
-    // blank loop
+    // increment
     var incrementIterations = 10000000;
-    var incrementReps = 16;
+    var incrementReps = 10;
     var incrementAvg;
     var incrementTrials = new Array();
     for (run = 0; run < incrementReps; run++) {
@@ -95,7 +112,7 @@ function main() {
     for (run = 0; run < factorialReps; run++) {
         queue(factorialArg + "!, trial #" + (run + 1), function() {
             var start = Date.now();
-            math.config({precision:14000});
+            math.config({precision:6000});
             console.log(factorialArg + "!: " + math.factorial(math.bignumber(factorialArg)));
             var dt = (Date.now() - start);
             factorialTrials.push(dt);
@@ -106,6 +123,8 @@ function main() {
         summary(factorialTrials);
     });
 
+    // TODO: more benchmarks here
+
     // finalize results
     queue("Collecting results", function() {
         document.getElementById("output").innerHTML = outputText;
@@ -113,6 +132,7 @@ function main() {
 
         document.getElementById("progressBarBg").style.height = "0px";
         document.getElementById("status").innerHTML = "Tests finished. Please enter any additional information that you'd like to provide into the box below (browser, phone model, how your day is going, etc.) and click the button when finished. The more information, the better! <br><br>The results of your test can be found below the button.";
+        document.title = "The Tanner Times Phone Study (waiting for input)";
         
         document.getElementById("button").innerHTML = "Click here to submit your results (does nothing yet)";
 
@@ -132,6 +152,7 @@ document.getElementById("button").onclick = function() {
         document.getElementById("button").setAttribute("style","display: none;");
         document.getElementById("progressBarBg").style.height = "50px";
         document.getElementById("status").innerHTML = "Starting...<br><br>";
+        document.title = "The Tanner Times Phone Study (working)";
         setTimeout(main,100);
     }
 }
