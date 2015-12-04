@@ -31,7 +31,7 @@ function runNextTask() {
         delay = 100;
     }
 
-    document.getElementById("status").innerHTML = ("Running task: " + currentTask[0] + "<br><br>");
+    document.getElementById("status").innerHTML = ("Running task: " + currentTask[0] + "<br>The page may appear to be frozen; please do not refresh or leave.<br><br>");
     completedTasks++;
     document.getElementById("progressBarFg").style.width = completedTasks/totalTasks*100 + "%";
 

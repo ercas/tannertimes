@@ -2,11 +2,11 @@
     <head>
         <title>The Tanner Times Phone Study (completed)</title>
         <meta charset=UTF-8>
-        <link rel=icon type=image/png href=favicon.png sizes=32x32>
+        <link rel=icon type=image/png href=img/favicon.png sizes=32x32>
         <link rel=stylesheet type=text/css href=style.css>
     </head>
     <body>
-        <a target=_blank href=http://thetannertimes.net><img id=header src=header.png ></a>
+        <a target=_blank href=http://thetannertimes.net><img id=header src=img/header.png ></a>
 
         <br><?php
             function err($msg) {
@@ -18,7 +18,7 @@
 
             /* unique hash of ip address and user agent to prevent multiple submissions from same browser */
             $id = hash("md4",$_SERVER["REMOTE_ADDR"].$_SERVER["HTTP_USER_AGENT"]);
-            $data = filter_var($_POST["results"]."\n\ncomments:\n    ".$_POST["comments"]);
+            $data = filter_var($_POST["results"]."\n\ncomments:\n    ".$_POST["comments"]."\n");
 
             if (file_exists("responses/".$id))
                 echo "<div class=error>Your previous response has been overwritten.</div><br>";
@@ -26,7 +26,7 @@
             
             echo "Thank you for participating in the study!<br><br>The following information was received:";
             echo "<pre><code>".$data."</code></pre>";
-            echo "Your identifier hash is ".$id.". Any subsequent tests performed from the same browser on the same device from the same IP address will overwrite previous tests.<br><br>If you want to try again with another browser, feel free to do so; that browser will be given a new hash.";
+            echo "Your identifier hash is ".$id.". Any subsequent tests performed from the same browser on the same device from the same IP address will overwrite previous tests.<br><br>If you want to <a href=/>try again</a> with another browser, feel free to do so; that browser will be given a new hash.";
         ?>
 
         <div id=footer>
