@@ -1,4 +1,4 @@
-mkdir -p responses/
+mkdir -p responses/ graphs/
 chmod a+w responses/
 docker run -d \
     -p 80:80 \
