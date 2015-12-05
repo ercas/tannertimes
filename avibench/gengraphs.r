@@ -15,9 +15,9 @@ png(
 )
 boxplot(
     subset(data,PHONE == 'android' & TASK == '10000000 increments')$RESULTS,subset(data,PHONE == 'iphone' & TASK == '10000000 increments')$RESULTS,subset(data,PHONE == 'windows phone' & TASK == '10000000 increments')$RESULTS,
-    main='"10000000 increments" Completion Time',
+    main='Task: 10000000 increments',
     xlab='Operating System',
-    ylab='Time (Milliseconds)',
+    ylab='Completion Time (Milliseconds)',
     names=c('Android', 'iPhone', 'Windows Phone'), # should be same order as for loop
     col=c(androidcolor,iphonecolor,windowscolor),
     frame.plot=FALSE
@@ -33,9 +33,9 @@ png(
 )
 boxplot(
     subset(data,PHONE == 'android' & TASK == '2048!')$RESULTS,subset(data,PHONE == 'iphone' & TASK == '2048!')$RESULTS,subset(data,PHONE == 'windows phone' & TASK == '2048!')$RESULTS,
-    main='"2048!" Completion Time',
+    main='Task: 2048!',
     xlab='Operating System',
-    ylab='Time (Milliseconds)',
+    ylab='Completion Time (Milliseconds)',
     names=c('Android', 'iPhone', 'Windows Phone'), # should be same order as for loop
     col=c(androidcolor,iphonecolor,windowscolor),
     frame.plot=FALSE
@@ -43,17 +43,35 @@ boxplot(
 dev.off()
 
 png(
-    filename='graphs/sjcl encrypt&decrypt 45248 characters.png',
+    filename='graphs/75 regex matches, 371 characters, 16 reps.png',
     width=1280,
     height=800,
     pointsize=32,
     family='Ubuntu Light'
 )
 boxplot(
-    subset(data,PHONE == 'android' & TASK == 'sjcl encrypt&decrypt 45248 characters')$RESULTS,subset(data,PHONE == 'iphone' & TASK == 'sjcl encrypt&decrypt 45248 characters')$RESULTS,subset(data,PHONE == 'windows phone' & TASK == 'sjcl encrypt&decrypt 45248 characters')$RESULTS,
-    main='"sjcl encrypt&decrypt 45248 characters" Completion Time',
+    subset(data,PHONE == 'android' & TASK == '75 regex matches, 371 characters, 16 reps')$RESULTS,subset(data,PHONE == 'iphone' & TASK == '75 regex matches, 371 characters, 16 reps')$RESULTS,subset(data,PHONE == 'windows phone' & TASK == '75 regex matches, 371 characters, 16 reps')$RESULTS,
+    main='Task: 75 regex matches, 371 characters, 16 reps',
     xlab='Operating System',
-    ylab='Time (Milliseconds)',
+    ylab='Completion Time (Milliseconds)',
+    names=c('Android', 'iPhone', 'Windows Phone'), # should be same order as for loop
+    col=c(androidcolor,iphonecolor,windowscolor),
+    frame.plot=FALSE
+)
+dev.off()
+
+png(
+    filename='graphs/SJCL encrypt, decrypt 371 characters, 32 reps.png',
+    width=1280,
+    height=800,
+    pointsize=32,
+    family='Ubuntu Light'
+)
+boxplot(
+    subset(data,PHONE == 'android' & TASK == 'SJCL encrypt, decrypt 371 characters, 32 reps')$RESULTS,subset(data,PHONE == 'iphone' & TASK == 'SJCL encrypt, decrypt 371 characters, 32 reps')$RESULTS,subset(data,PHONE == 'windows phone' & TASK == 'SJCL encrypt, decrypt 371 characters, 32 reps')$RESULTS,
+    main='Task: SJCL encrypt, decrypt 371 characters, 32 reps',
+    xlab='Operating System',
+    ylab='Completion Time (Milliseconds)',
     names=c('Android', 'iPhone', 'Windows Phone'), # should be same order as for loop
     col=c(androidcolor,iphonecolor,windowscolor),
     frame.plot=FALSE

@@ -8,7 +8,7 @@
     <body>
         <a target=_blank href=http://thetannertimes.net><img id=header src=img/header.png></a>
         <br>
-        <div class=error>WORK IN PROGRESS - PRE-PILOT<br><br></div>
+        <div class=error>WORK IN PROGRESS - PILOT RUN<br><br></div>
         <div id=status>
             Thank you for choosing to participate in the smartphone study! Click the button below to begin the automated testing.
             <br>
@@ -43,7 +43,7 @@
         <script>
             var agent = navigator.userAgent;
             if (! agent.match(/android|iphone|windows phone/i))
-                document.getElementById("status").innerHTML = document.getElementById("status").innerHTML + "<span style='color: #ff0000;'>It has been detected that you may not currently be using a smartphone.</span><br><br>";
+                document.getElementById("status").innerHTML = document.getElementById("status").innerHTML + "<span style='color: #ff0000;'>It has been detected that you may not currently be using a smartphone. If you are, or would like to run the test anyway, feel free to continue.</span><br><br>";
             document.getElementById("button").innerHTML = "Start";
         </script>
         <script src=benchmark.js></script>

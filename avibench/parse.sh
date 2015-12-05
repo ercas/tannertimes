@@ -68,9 +68,9 @@ png(
 )
 boxplot(
     $subsets,
-    main='"$task" Completion Time',
+    main='Task: $task',
     xlab='Operating System',
-    ylab='Time (Milliseconds)',
+    ylab='Completion Time (Milliseconds)',
     names=c('Android', 'iPhone', 'Windows Phone'), # should be same order as for loop
     col=c(androidcolor,iphonecolor,windowscolor),
     frame.plot=FALSE

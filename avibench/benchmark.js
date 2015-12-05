@@ -2,7 +2,7 @@
 var outputText = "test results\n    all measurements are in milliseconds unless otherwise specified";
 
 // base string used for string manipulations, thanks to http://www.lipsum.com/
-var baseString = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent egestas laoreet porttitor. Quisque eu dignissim turpis, eu feugiat sapien. Duis at vestibulum quam. Sed eget ipsum leo. Duis eu ligula sem. Suspendisse vitae faucibus enim. Aliquam erat volutpat. Vestibulum condimentum ut erat ac rhoncus. Nulla porttitor scelerisque tortor, a pretium sapien pretium quis. Donec maximus vitae quam sed malesuada. Aliquam luctus justo neque, et varius dui porta vulputate. Donec vulputate urna velit, vitae efficitur ante venenatis a. Aenean vehicula, erat fringilla consectetur aliquet, ex enim elementum ex, et tincidunt sapien ligula ut metus. Sed rutrum diam dapibus justo sagittis, at tempus erat ornare.";
+var baseString = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent egestas laoreet porttitor. Quisque eu dignissim turpis, eu feugiat sapien. Duis at vestibulum quam. Sed eget ipsum leo. Duis eu ligula sem. Suspendisse vitae faucibus enim. Aliquam erat volutpat. Vestibulum condimentum ut erat ac rhoncus. Nulla porttitor scelerisque tortor, a pretium sapien pretium quis.";
 
 var completedTasks = 0;
 var taskQueue = new Array();
@@ -18,6 +18,11 @@ function output(arg,header) {
     else
         outputText += "    ";
     outputText += arg;
+}
+
+// change the status easily
+function changeStatus(arg) {
+    document.getElementById("status").innerHTML = arg + "<br><br>"
 }
 
 // print quick summary statistics and extra data of an array of numbers
@@ -64,7 +69,7 @@ function runNextTask() {
         delay = 50;
     }
 
-    document.getElementById("status").innerHTML = ("Running task: " + currentTask[0] + "<br>The page may appear to be frozen; please do not refresh or leave.<br><br>");
+    changeStatus("Running task: " + currentTask[0] + "<br>The page may appear to be frozen; please do not refresh or leave.");
     completedTasks++;
     document.getElementById("progressBarFg").style.width = completedTasks/totalTasks*100 + "%";
 
@@ -87,11 +92,13 @@ function main() {
     });
     
     // increment
+    changeStatus("Loading increment...");
     var incrementIterations = 10000000;
-    var incrementReps = 10;
-    var incrementTrials = new Array();
-    for (run = 0; run < incrementReps; run++) {
-        queue(incrementIterations + " increments, trial #" + (run + 1), function() {
+    var incrementTrials = 10;
+    var incrementData = new Array();
+    var incrementTitle = incrementIterations + " increments";
+    for (run = 0; run < incrementTrials; run++) {
+        queue(incrementTitle + ", trial #" + (run + 1), function() {
             var start = Date.now();
             var x = 0;
             for (i = 0; i < incrementIterations; i++) {
@@ -99,48 +106,83 @@ function main() {
             }
             var dt = (Date.now() - start);
             console.log("x = " + x);
-            incrementTrials.push(dt);
+            incrementData.push(dt);
         });
     }
     queue("Collecting increment results", function() {
-        output(incrementIterations + " increments",true);
-        summary(incrementTrials);
+        output(incrementTitle,true);
+        summary(incrementData);
     });
 
     // factorial (math.js 2.4.2)
+    changeStatus("Loading factorial...");
     var factorialArg = 2048;
-    var factorialReps = 10;
-    var factorialTrials = new Array();
-    for (run = 0; run < factorialReps; run++) {
-        queue(factorialArg + "!, trial #" + (run + 1), function() {
+    var factorialTrials = 10;
+    var factorialData = new Array();
+    var factorialTitle = factorialArg + "!";
+    for (run = 0; run < factorialTrials; run++) {
+        queue(factorialTitle + ", trial #" + (run + 1), function() {
             var start = Date.now();
             math.config({precision:6000});
             console.log(factorialArg + "!: " + math.factorial(math.bignumber(factorialArg)));
             var dt = (Date.now() - start);
-            factorialTrials.push(dt);
+            factorialData.push(dt);
         });
     }
     queue("Collecting factorial results", function() {
-        output(factorialArg + "!",true);
-        summary(factorialTrials);
+        output(factorialTitle,true);
+        summary(factorialData);
     });
 
-    // crypto (sjcl 1.0.0)
-    var cryptoPass = "ayy lmao";
-    var cryptoString = baseString.repeat(64);
-    var cryptoReps = 10;
-    var cryptoTrials = new Array();
-    for (run = 0; run < cryptoReps; run++) {
-        queue("sjcl encrypt, decrypt " + cryptoString.length + " characters, trial #" + (run + 1), function() {
+    // regex
+    changeStatus("Loading regex...");
+    var regexTrials = 10;
+    var regexReps = 16;
+    var regexChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890~!@#$%^&_|:<>"; // each one is iterated over
+    var regexData = new Array();
+    var regexTitle = regexChars.length + " regex matches, " + baseString.length + " characters, " + regexReps + " reps";
+    for (run = 0; run < regexTrials; run++) {
+        queue(regexTitle + ", trial #" + (run + 1), function() {
             var start = Date.now();
-            console.log(sjcl.decrypt(cryptoPass,sjcl.encrypt(cryptoPass,cryptoString)));
+            for (r = 0; r < regexReps; r++) {
+                var str = baseString;
+                for (i = 0; i < regexChars.length; i++) {
+                    var regex = new RegExp(regexChars.charAt(i),"g");
+                    str = str.replace(regex,"0");
+                }
+                console.log(str);
+            }
             var dt = (Date.now() - start);
-            cryptoTrials.push(dt);
+            regexData.push(dt);
+        });
+    }
+    queue("Collecting regex results", function() {
+        output(regexTitle,true);
+        summary(regexData);
+    });
+    
+
+    // crypto (sjcl 1.0.0)
+    changeStatus("Loading crypto...");
+    var cryptoPass = "ayy lmao";
+    var cryptoTrials = 10;
+    var cryptoReps = 32;
+    var cryptoData = new Array();
+    var cryptoTitle = "SJCL encrypt, decrypt " + baseString.length + " characters, " + cryptoReps + " reps";
+    for (run = 0; run < cryptoTrials; run++) {
+        queue(cryptoTitle + ", trial #" + (run + 1), function() {
+            var str = baseString;
+            var start = Date.now();
+            for (i = 0; i < cryptoReps; i++) {
+                console.log(sjcl.decrypt(cryptoPass,sjcl.encrypt(cryptoPass,str)));
+            }
+            var dt = (Date.now() - start);
+            cryptoData.push(dt);
         });
     }
     queue("Collecting crypto results", function() {
-        output("sjcl encrypt, decrypt " + cryptoString.length + " characters",true);
-        summary(cryptoTrials);
+        output(cryptoTitle,true);
+        summary(cryptoData);
     });
 
     // TODO: more benchmarks here
@@ -171,7 +213,7 @@ document.getElementById("button").onclick = function() {
         document.getElementById("button").innerHTML = "Working...";
         document.getElementById("button").setAttribute("style","display: none;");
         document.getElementById("progressBarBg").style.height = "50px";
-        document.getElementById("status").innerHTML = "Starting...<br><br>";
+        changeStatus("Starting...");
         document.title = "The Tanner Times Phone Study (working)";
         setTimeout(main,100);
     }
