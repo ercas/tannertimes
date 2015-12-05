@@ -1,8 +1,12 @@
+// header of the output log
+var outputText = "test results\n    all measurements are in milliseconds unless otherwise specified";
+
+// base string used for string manipulations, thanks to http://www.lipsum.com/
+var baseString = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent egestas laoreet porttitor. Quisque eu dignissim turpis, eu feugiat sapien. Duis at vestibulum quam. Sed eget ipsum leo. Duis eu ligula sem. Suspendisse vitae faucibus enim. Aliquam erat volutpat. Vestibulum condimentum ut erat ac rhoncus. Nulla porttitor scelerisque tortor, a pretium sapien pretium quis. Donec maximus vitae quam sed malesuada. Aliquam luctus justo neque, et varius dui porta vulputate. Donec vulputate urna velit, vitae efficitur ante venenatis a. Aenean vehicula, erat fringilla consectetur aliquet, ex enim elementum ex, et tincidunt sapien ligula ut metus. Sed rutrum diam dapibus justo sagittis, at tempus erat ornare.";
+
 var completedTasks = 0;
 var taskQueue = new Array();
 var totalTasks;
-
-var outputText = "test results\n    all measurements are in milliseconds unless otherwise specified";
 
 var running = false;
 
@@ -16,7 +20,7 @@ function output(arg,header) {
     outputText += arg;
 }
 
-// print summary statistics and extra data of an array of numbers
+// print quick summary statistics and extra data of an array of numbers
 function summary(array) {
     var n = array.length;
     array.sort(function(a,b) {
@@ -85,7 +89,6 @@ function main() {
     // increment
     var incrementIterations = 10000000;
     var incrementReps = 10;
-    var incrementAvg;
     var incrementTrials = new Array();
     for (run = 0; run < incrementReps; run++) {
         queue(incrementIterations + " increments, trial #" + (run + 1), function() {
@@ -104,10 +107,9 @@ function main() {
         summary(incrementTrials);
     });
 
-    // factorial
+    // factorial (math.js 2.4.2)
     var factorialArg = 2048;
     var factorialReps = 10;
-    var factorialAvg;
     var factorialTrials = new Array();
     for (run = 0; run < factorialReps; run++) {
         queue(factorialArg + "!, trial #" + (run + 1), function() {
@@ -121,6 +123,24 @@ function main() {
     queue("Collecting factorial results", function() {
         output(factorialArg + "!",true);
         summary(factorialTrials);
+    });
+
+    // crypto (sjcl 1.0.0)
+    var cryptoPass = "ayy lmao";
+    var cryptoString = baseString.repeat(64);
+    var cryptoReps = 10;
+    var cryptoTrials = new Array();
+    for (run = 0; run < cryptoReps; run++) {
+        queue("sjcl encrypt, decrypt " + cryptoString.length + " characters, trial #" + (run + 1), function() {
+            var start = Date.now();
+            console.log(sjcl.decrypt(cryptoPass,sjcl.encrypt(cryptoPass,cryptoString)));
+            var dt = (Date.now() - start);
+            cryptoTrials.push(dt);
+        });
+    }
+    queue("Collecting crypto results", function() {
+        output("sjcl encrypt, decrypt " + cryptoString.length + " characters",true);
+        summary(cryptoTrials);
     });
 
     // TODO: more benchmarks here

@@ -10,6 +10,7 @@ mkdir -p $workdir $datadir
 (grep -rliE "^    user-agent:.*(android|iphone|windows phone)" responses/ && echo $workdir) | xargs cp
 rm $datadir/*
 
+>$datadir/tasks.config
 echo "PHONE${sep}TASK${sep}RESULTS" | tee $datadir/raw.csv >  $datadir/byTrial.csv
 for phone in android iphone "windows phone"; do
     grep -rli "^    user-agent:.*$phone" $workdir | while read file; do
@@ -17,26 +18,31 @@ for phone in android iphone "windows phone"; do
             results="$(grep -ozP "(?<=^task: $task\n    items: ).*(?=\n)" $file | tr -dc "[0-9],")" 
             if ! [ -z "$results" ]; then
                 # dirty carriage return slipped in somewhere, tr -d "\r" needed
+                task=$(tr -d "\r" <<< "$task")
 
-                tr -d "\r" <<< "${phone}${sep}${task}${sep}${results}" >> $datadir/raw.csv
+                echo "${phone}${sep}${task}${sep}${results}" >> $datadir/raw.csv
 
                 tr "," "\n" <<< "$results" | while read trial; do
-                    tr -d "\r" <<< "${phone}${sep}${task}${sep}${trial}" >> $datadir/byTrial.csv
+                    echo "${phone}${sep}${task}${sep}${trial}" >> $datadir/byTrial.csv
                 done
+
+                echo $task >> $datadir/tasks.config
             fi
         done
     done
 done
+sort $datadir/tasks.config | uniq > tasks.config.temp
+mv tasks.config.temp $datadir/tasks.config
 
 rm -rf $workdir
 
-########## generate and run R script
+########## generate and run R script to create graphs
 
 script=gengraphs.r
 graphdir=graphs
 
 mkdir -p $graphdir
-# rm $graphdir/*
+rm $graphdir/*
 
 cat << EOF > $script
 # generated with parse.sh
@@ -48,7 +54,7 @@ iphonecolor <- "#f7f9fa"
 windowscolor <- "#0078d7"
 
 EOF
-for task in "2048!" "10000000 increments"; do
+cat $datadir/tasks.config | while read task; do
     subsets=$(for phone in android iphone "windows phone"; do
         echo -n "subset(data,PHONE == '$phone' & TASK == '$task')\$RESULTS,"
     done | head -c -1)

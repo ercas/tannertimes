@@ -26,9 +26,9 @@
             file_put_contents("responses/".$id, $data) or err("Could not write response to file");
 
             /* update the page with some text */
-            echo "Thank you for participating in the study!<br>";
+            echo "Thank you for participating in the study! Click <a href=graphs.php>here</a> to see the current results.<br>";
             if (! preg_match("/android|iphone|windows phone/i",$_SERVER["HTTP_USER_AGENT"]))
-                echo "<br><span style='color: #ff0000;'>It has been detected that you may not currently be using a smartphone. If you are: please send a screenshot of your identifier hash (at the bottom) to the Tanner Times, or your results may be excluded from the study. The bar at the top of the phone must be visible. Apologies for any inconveniences.</span><br>";
+                echo "<br><span style='color: #ff0000;'>It was previously detected that you may not currently be using a smartphone. If you are: please send a screenshot of your identifier hash (at the bottom) to the Tanner Times, or your results may be excluded from the study. The bar at the top of the phone must be visible. Apologies for any inconveniences.</span><br>";
             echo "<br>The following information was received:<pre><code>".$data."</code></pre>";
             echo "Your identifier hash is <span style='color: #2b6ca3;'>".$id."</span>. Any subsequent tests performed from the same browser on the same device from the same IP address will overwrite previous tests.<br><br>If you want to <a href=/>try again</a> with another browser, feel free to do so; that browser will be given a new hash.";
         ?>

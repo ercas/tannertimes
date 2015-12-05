@@ -35,10 +35,11 @@
 
         <div id=footer>
             <br>
-            <br>The source code for this project is available on <a target=_blank href=http://github.com/ercas/tannertimes/tree/master/avibench>GitHub</a>.
+            <br><?php echo "Server info: ".$_SERVER["SERVER_SOFTWARE"]." running on ".php_uname("s")." ".php_uname("r")." ".php_uname("m")." port ".$_SERVER["SERVER_PORT"]." | "?>The source code for this project is available on <a target=_blank href=http://github.com/ercas/tannertimes/tree/master/avibench>GitHub</a>.
         </div>
 
         <script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/2.4.2/math.min.js></script>
+        <script src=https://cdnjs.cloudflare.com/ajax/libs/sjcl/1.0.0/sjcl.min.js></script>
         <script>
             var agent = navigator.userAgent;
             if (! agent.match(/android|iphone|windows phone/i))
