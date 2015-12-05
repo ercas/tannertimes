@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+########## generate csv files
+
 workdir=parsedResponses
 outdir="data"
 sep="|"
@@ -27,3 +29,18 @@ for phone in android iphone "windows phone"; do
 done
 
 rm -rf $workdir
+
+########## generate R script
+
+script=gengraphs.r
+# labels should be in the same order as the loop below
+labels="'Android','iPhone','Windows Phone'"
+
+echo 'data <- read.csv(file="data/byTrial.csv",sep="|",header=TRUE)' > $script
+for task in "2048!" "10000000 increments"; do
+    echo -n "boxplot("
+    for phone in android iphone "windows phone"; do
+        echo -n "subset(data,PHONE == '$phone' & TASK == '$task')\$RESULTS,"
+    done | head -c -1
+    echo ",main='$task',xlab='Phone',ylab='Time (Milliseconds)',names=c($labels))"
+done >> $script

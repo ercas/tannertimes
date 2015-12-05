@@ -1,0 +1,3 @@
+data <- read.csv(file="data/byTrial.csv",sep="|",header=TRUE)
+boxplot(subset(data,PHONE == 'android' & TASK == '2048!')$RESULTS,subset(data,PHONE == 'iphone' & TASK == '2048!')$RESULTS,subset(data,PHONE == 'windows phone' & TASK == '2048!')$RESULTS,main='2048!',xlab='Phone',ylab='Time (Milliseconds)',names=c('Android','iPhone','Windows Phone'))
+boxplot(subset(data,PHONE == 'android' & TASK == '10000000 increments')$RESULTS,subset(data,PHONE == 'iphone' & TASK == '10000000 increments')$RESULTS,subset(data,PHONE == 'windows phone' & TASK == '10000000 increments')$RESULTS,main='10000000 increments',xlab='Phone',ylab='Time (Milliseconds)',names=c('Android','iPhone','Windows Phone'))
