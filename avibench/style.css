@@ -3,6 +3,7 @@ light blue: #b6d3dd
 blue: #2b6ca3
 grey: #f0f0f0
 */
+
 body {
     background-image: url("img/background.png");
     background-repeat: repeat;
@@ -41,6 +42,7 @@ td {
     border-width: 5px;
     padding: 10px;
 }
+
 .error {
     color: #ff0000;
     text-align: center;
@@ -48,6 +50,7 @@ td {
 .highlight {
     color: #2b6ca3;
 }
+
 #commentsField {
     font-size: 30px;
     height: 200px;

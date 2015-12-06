@@ -41,8 +41,7 @@
         <script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/2.4.2/math.min.js></script>
         <script src=https://cdnjs.cloudflare.com/ajax/libs/sjcl/1.0.0/sjcl.min.js></script>
         <script>
-            var agent = navigator.userAgent;
-            if (! agent.match(/android|iphone|windows phone/i))
+            if (! navigator.userAgent.match(/android|iphone|windows phone/i))
                 document.getElementById("status").innerHTML = document.getElementById("status").innerHTML + "<span style='color: #ff0000;'>It has been detected that you may not currently be using a smartphone. If you are, or would like to run the test anyway, feel free to continue.</span><br><br>";
             document.getElementById("button").innerHTML = "Start";
         </script>

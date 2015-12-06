@@ -16,16 +16,17 @@
             if (empty($_POST["results"]))
                 err("No results received");
 
-            /* unique hash of ip address and user agent to prevent multiple submissions from same browser */
+            // unique hash of ip address and user agent to prevent multiple submissions from same browser
+            // this hash becomes the file name that results are saved to
             $id = hash("md4",$_SERVER["REMOTE_ADDR"].$_SERVER["HTTP_USER_AGENT"]);
             $data = filter_var($_POST["results"]."\n\ncomments:\n    ".$_POST["comments"]."\n");
             
-            /* write the submitted form to a file */
+            // write the submitted form to a file
             if (file_exists("responses/".$id))
                 echo "<div class=error>Your previous response has been overwritten.</div><br>";
             file_put_contents("responses/".$id, $data) or err("Could not write response to file");
 
-            /* update the page with some text */
+            // update the page with some text
             echo "Thank you for participating in the study! Click <a href=graphs.php>here</a> to see the current results.<br>";
             if (! preg_match("/android|iphone|windows phone/i",$_SERVER["HTTP_USER_AGENT"]))
                 echo "<br><span style='color: #ff0000;'>It was previously detected that you may not currently be using a smartphone. If you are: please send a screenshot of your identifier hash (at the bottom) to the Tanner Times, or your results may be excluded from the study. The bar at the top of the phone must be visible. Apologies for any inconveniences.</span><br>";

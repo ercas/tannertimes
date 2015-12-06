@@ -1,3 +1,5 @@
+#!/bin/sh
+
 mkdir -p responses/ graphs/
 chmod a+w responses/
 docker run -d \
