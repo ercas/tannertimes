@@ -69,7 +69,7 @@ function runNextTask() {
         delay = 50;
     }
 
-    changeStatus("Running task: " + currentTask[0] + "<br>The page may appear to be frozen; please do not refresh or leave.");
+    changeStatus("Running task: " + currentTask[0] + "<br>The page may appear to be frozen; please <span class=highlight>do not</span> refresh, leave the tab, or close the app.");
     completedTasks++;
     document.getElementById("progressBarFg").style.width = completedTasks/totalTasks*100 + "%";
 
@@ -140,7 +140,7 @@ function main() {
     var regexReps = 16;
     var regexChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890~!@#$%^&_|:<>"; // each one is iterated over
     var regexData = new Array();
-    var regexTitle = regexChars.length + " regex matches, " + baseString.length + " characters, " + regexReps + " reps";
+    var regexTitle = regexChars.length + " regex replaces, " + baseString.length + " characters, " + regexReps + " reps";
     for (run = 0; run < regexTrials; run++) {
         queue(regexTitle + ", trial #" + (run + 1), function() {
             var start = Date.now();
@@ -193,7 +193,7 @@ function main() {
         document.getElementById("outputBox").removeAttribute("style");
 
         document.getElementById("progressBarBg").style.height = "0px";
-        document.getElementById("status").innerHTML = "Tests finished. Please enter any additional information that you'd like to provide into the box below (browser, phone model, how your day is going, etc.) and click the button when finished. The more information, the better! <br><br>The results of your test can be found below the button.";
+        document.getElementById("status").innerHTML = "Tests finished. Please <span class=highlight>enter any additional information</span> that you'd like to provide into the box below (browser, phone model, how your day is going, etc.) and <span class=highlight>click the button</span> when finished. The more information, the better! <br><br>The results of your test can be found below the button.";
         document.title = "The Tanner Times Phone Study (waiting for input)";
         
         document.getElementById("button").innerHTML = "Click here to submit your results (does nothing yet)";
