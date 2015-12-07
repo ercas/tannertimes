@@ -90,8 +90,6 @@ function runNextTask() {
 
 function main() {
 
-    element("description").removeAttribute("style");
-
     // first, queue all tasks
 
     // dump browser info
@@ -232,6 +230,7 @@ element("button").onclick = function() {
         element("progressBarBg").style.height = "50px";
         changeStatus("Starting...");
         document.title = "The Tanner Times Phone Study (working)";
+        element("description").removeAttribute("style");
         setTimeout(main,100);
     }
 }
