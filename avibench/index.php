@@ -29,6 +29,8 @@
             <div id=progressBarFg></div>
         </div>
 
+        <div id=description style="display: none;"></div>
+
         <button id="button" type="button">Loading resources...</button>
 
         <pre id="outputBox" style="display: none;"><code id=output></code></pre>
