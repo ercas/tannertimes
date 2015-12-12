@@ -134,7 +134,7 @@ function main() {
         cryptoReps = 32,
         cryptoData = new Array(),
         cryptoTitle = "SJCL encrypt, decrypt " + baseString.length + " characters, " + cryptoReps + " reps",
-        cryptoDesc = "Testing how fast the browser can encrypt and decrypt a string multiple times, using the Stanford JavaScript Crypto Library";
+        cryptoDesc = "Testing how fast the browser can encrypt and decrypt messages, using the Stanford JavaScript Crypto Library";
     for (run = 0; run < cryptoTrials; run++) {
         queue(cryptoTitle + ", trial #" + (run + 1), function() {
             changeDescription(cryptoDesc);
@@ -183,7 +183,7 @@ function main() {
         factorialTrials = 10
         factorialData = new Array()
         factorialTitle = factorialArg + "!",
-        factorialDesc = "Testing how fast the browser can solve the factorial of 2048";
+        factorialDesc = "Testing how fast the browser can solve the factorial of 2048, using the math.js library";
     for (run = 0; run < factorialTrials; run++) {
         queue(factorialTitle + ", trial #" + (run + 1), function() {
             changeDescription(factorialDesc);

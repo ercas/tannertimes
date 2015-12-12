@@ -8,7 +8,7 @@
     <body>
         <a target=_blank href=http://thetannertimes.net><img id=header src=img/header.png></a>
         <br>
-        <div class=error>WORK IN PROGRESS - PILOT RUN<br><br></div>
+        <div class=error>Study ended 11 December 2015 @ 9:46 PM. You can still benchmark your phone if you want, but your results will not be included in the study. Thank you everyone who participated!<br><br></div>
         <div id=status>
             Thank you for choosing to participate in the smartphone study! Click the button below to begin the automated testing.
             <br>

@@ -15,6 +15,7 @@
             
             // get "last updated" info from an arbitrary image in the graphs/ directory
             echo "Last updated on ".date("d F Y \a\\t h:i A", filemtime("graphs/2048!.png")-18000).". Extra information can be found at the bottom.<br>"; // -18000 = time zone adjustment
+
             // display graphs by globbing the graphs/ directory
             foreach (glob("graphs/*") as $graph) {
                 echo "<br><img width=70% style='display: block; margin: 0 auto;' src='$graph'>";
@@ -27,6 +28,9 @@
             }
             echo "<tr style='color: #2b6ca3;'><td>Total</td><td>".exec("grep 2048 data/raw.csv | wc -l")."</td></tr><table>";
             echo "<br><div style='text-align: center; width: 80%; margin: 0 auto;'>Total responses (including non-smartphone): ".exec("ls responses/ | wc -l")."</div>";
+
+            // link to the raw data
+            echo "<br><a href=data/byTrial.csv>Click here</a> to download a formatted .csv file of the data. The delimeter is the vertical bar character (|).<br>";
 
             echo "<br><a href=/>Click here</a> to go back to the main page.";
         ?>
