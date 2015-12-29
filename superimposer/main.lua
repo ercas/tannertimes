@@ -56,8 +56,8 @@ mouseRotated = 0
     how to composite with imagemagick:
 
     convert -size [FINAL IMAGE SIZE] xc:none \
-        \( 1.jpg -alpha on -channel a -evaluate set [LAYER_TRANSPARENCY] -background transparent -rotate [DEG] -scale [SCALE]% \) -gravity center -geometry [OFFSET] -composite \
-        \( 2.jpg -alpha on -channel a -evaluate set [LAYER_TRANSPARENCY] -background transparent -rotate [DEG] -scale [SCALE]% \) -gravity center -geometry [OFFSET] -composite \
+        \( 1.jpg -alpha on -channel a -evaluate set [LAYER_OPACITY] -background transparent -rotate [DEG] -scale [SCALE]% \) -gravity center -geometry [OFFSET] -composite \
+        \( 2.jpg -alpha on -channel a -evaluate set [LAYER_OPACITY] -background transparent -rotate [DEG] -scale [SCALE]% \) -gravity center -geometry [OFFSET] -composite \
         out.jpg
 --]]
 function appendLayer(path, x, y, rot, scale, transparency)
@@ -73,10 +73,10 @@ function appendLayer(path, x, y, rot, scale, transparency)
         ySign = ""
     end
     if not transparency then
-        transparency = "$LAYER_TRANSPARENCY"
+        transparency = "$LAYER_OPACITY"
     end
-    layerString = "\n    \\( '"..
-                      path.."' -alpha on -channel a "..
+    layerString = "\n    \\( \""..
+                      path.."\" -alpha on -channel a "..
                       "-evaluate set "..transparency.."% "..
                       "-background transparent "..
                       "-rotate "..rot.." "..
@@ -179,7 +179,7 @@ function love.mousepressed(x, y, button)
 
             -- add final touches to convertString and turn it into a standalone
             -- shell script
-            convertString = "\n\n#!/usr/bin/env/sh "..
+            convertString = "#!/usr/bin/env sh "..
                             "\n# generated with superimposer"..
                             "\n\n"..convertString..
                             "\n    "..outputImage.." && \\"..
@@ -195,7 +195,7 @@ function love.mousepressed(x, y, button)
 
             print("\nwrote script to "..outputScript)
             print("to use: sh superimpose.sh OR ./superimpose.sh")
-            print("\nchange the LAYER_TRANSPARENCY variable in that script if you need more or")
+            print("\nchange the LAYER_OPACITY variable in that script if you need more or")
             print("less transparent layers.")
             if not hasImageMagick then
                 print("\nWARNING: this script needs ImageMagick installed to run.")
@@ -318,8 +318,8 @@ function love.load(args)
     setBaseScale()
     
     -- generate the rest of convertString, minus layers and output image
-    convertString = "LAYER_TRANSPARENCY=50"..
-                    "\nMAGICK_TMPDIR=$HOME"..
+    convertString = "LAYER_OPACITY=50"..
+                    "\nMAGICK_TMPDIR=$HOME # this is where temporary files will be kept"..
                     "\n\n"..convertString.." "..
                     "-size "..baseImage:getWidth().."x"..baseImage:getHeight().." "..
                     "xc:none \\"..
