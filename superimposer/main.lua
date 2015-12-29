@@ -4,6 +4,8 @@
 -- possibly rework the rotation mechanism so the controls are more similar to
 -- gimp's controls
 
+love.window.setMode(400, 600, { resizable = true })
+
 -- config
 imageExtensions = {
     "jpg",
@@ -12,6 +14,7 @@ imageExtensions = {
 rotationSensitivity = 0.005
 scaleSensitivity = 0.01
 
+-- misc
 images = {}
 baseImage = nil
 baseScale = 1 -- only used internally to make the baseImage fill the window
@@ -26,7 +29,7 @@ translation = {x = 0, y = 0}
 rotation =  0
 scale = 1
 
--- used for controls
+-- used for transformations
 dragging = false
 mouseOriginalPosition = {x = 0, y = 0}
 mouseDragged = {x = 0, y = 0}
@@ -55,6 +58,19 @@ function imageFromPath(path)
     local imageData = love.filesystem.newFileData(imageDataRaw, path:match("[^/]+$"))
     local imageObject = love.graphics.newImage(imageData)
     return imageObject
+end
+
+-- rescale everything so that the base image fills as much of the window as
+-- possible. this is only a visual thing and has no bearing on the actual scale.
+function setBaseScale()
+    windowWidth, windowHeight = love.graphics.getDimensions()
+    local widthProportion = windowWidth/baseImage:getWidth()
+    local heightProportion = windowHeight/baseImage:getHeight()
+    if widthProportion < heightProportion then
+        baseScale = widthProportion
+    else
+        baseScale = heightProportion
+    end
 end
 
 -- overlay a new image and reset the variables
@@ -156,6 +172,11 @@ function love.wheelmoved(x, y)
     scale = scale + (y * scaleSensitivity)
 end
 
+--== other events ============================================================--
+function love.resize()
+    setBaseScale()
+end
+
 --============================================================================--
 function love.load(args)
     -- parse arguments for valid images and add them to the images table
@@ -181,20 +202,10 @@ function love.load(args)
     for index, value in pairs(images) do
         print(index, value)
     end
+    print("loaded "..#images.." images")
 
     baseImage = imageFromPath(table.remove(images, 1))
-
-    -- set the baseScale
-    windowWidth, windowHeight = love.graphics.getDimensions()
-    local widthProportion = windowWidth/baseImage:getWidth()
-    local heightProportion = windowHeight/baseImage:getHeight()
-    if widthProportion < heightProportion then
-        baseScale = widthProportion
-    else
-        baseScale = heightProportion
-    end
-
-    -- overlay the first image
+    setBaseScale()
     overlayNewImage()
 end
 
@@ -204,9 +215,11 @@ function love.draw()
     local rot = rotation + mouseRotated
     local sc = scale * baseScale
 
+    -- base image
     love.graphics.setColor(255, 255, 255, 255)
     love.graphics.draw(baseImage, 0, 0, 0, baseScale, baseScale)
 
+    -- overlay image
     love.graphics.setColor(255, 255, 255, 150)
     love.graphics.draw(
         overlayImage,
@@ -219,8 +232,9 @@ function love.draw()
         overlayImage:getHeight()/2
     )
 
+    -- heads up display
     love.graphics.setColor(0, 0, 0, 150)
     love.graphics.rectangle("fill", 0, 0, windowWidth, 22)
     love.graphics.setColor(255, 255, 255, 255)
-    love.graphics.print("translation: "..math.floor(x / baseScale)..","..math.floor(y / baseScale).." pixels  |  rotation: "..rot.." radians  |  scale: "..(scale * 100).."%  |  path: "..overlayPath, 5, 5)
+    love.graphics.print("translation: "..math.floor(x / baseScale)..", "..math.floor(y / baseScale).." pixels  |  rotation: "..rot.." radians  |  scale: "..(scale * 100).."%  |  overlay: "..overlayPath, 5, 5)
 end
