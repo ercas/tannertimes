@@ -15,3 +15,7 @@ a small smartphone browser performance survey suite including a server and data 
     4. make sure responses/ is writable by your server
     5. start up the server
 parse.sh is a script to parse the data and generate graphs from responses in the responses/ directory and put them in the graphs/ directory. graphs.php generates a page with all of these graphs.
+
+superimposer
+------------
+wip tool to make it easy to superimpose large quantities of images
