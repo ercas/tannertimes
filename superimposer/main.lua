@@ -16,12 +16,17 @@ scaleSensitivity = 0.01
 
 -- misc
 images = {}
+
 baseImage = nil
+basePath = nil
 baseCenter = {x = 0, y = 0}
 baseScale = 1 -- only used internally to make the baseImage fill the window
-convertString = ""
+
 windowWidth = 0
 windowHeight = 0
+
+convertString = "/usr/bin/env convert" -- manipulated further in love.load
+hasImageMagick = false
 
 -- overlay image properties
 overlayImage = nil
@@ -29,6 +34,9 @@ overlayPath = nil
 translation = {x = 0, y = 0}
 rotation =  0
 scale = 1
+
+actualTranslation = {x = 0, y = 0} -- translation, adjusted for baseScale
+degreesRotation = 0 -- rotation in degrees instead of radians
 
 -- used for transformations
 dragging = false
@@ -40,6 +48,54 @@ mouseRotationOrigin = 0
 mouseRotated = 0
 
 --== functions ===============================================================--
+-- append a new layer to convertString
+--[[
+    NOTE TO SELF: how to composite with imagemagick
+
+    convert -size [FINAL IMAGE SIZE] xc:white \
+        \( 1.jpg -alpha on -channel a -evaluate set [LAYER_TRANSPARENCY] -background transparent -rotate [DEG] \) -gravity center -geometry [OFFSET] -composite \
+        \( 2.jpg -alpha on -channel a -evaluate set [LAYER_TRANSPARENCY] -background transparent -rotate [DEG] \) -gravity center -geometry [OFFSET] -composite \
+        out.jpg
+
+    where
+        DEG = rotation
+        OFFSET = "+"..translation.x.."+"..translation.y
+
+    ex
+    rm -f out.jpg
+    convert -size 620x372 xc:none \
+        \( c.jpg \) -composite \
+        \( c.jpg -alpha on -channel a -evaluate set 50% -background transparent -rotate 15 \) -gravity center -geometry +100+100 -composite \
+        out.jpg
+    feh out.jpg
+--]]
+function appendLayer(path, x, y, rot, scale)
+    local xSign, ySign, layerString
+    if x >= 0 then
+        xSign = "+"
+    else
+        xSign = ""
+    end
+    if y >= 0 then
+        ySign = "+"
+    else
+        ySign = ""
+    end
+    layerString = "\n    \\( '"..
+                      path.."' -alpha on -channel a "..
+                      "-evaluate set $LAYER_TRANSPARENCY% "..
+                      "-background transparent "..
+                      "-rotate "..rot.." "..
+                      "-scale "..math.floor(scale*100).."% "..
+                  "\\) "..
+                  "-gravity center "..
+                  "-geometry "..xSign..x..
+                                ySign..y.." "..
+                  "-composite \\"
+    convertString = convertString..layerString
+    print("appended "..layerString)
+end
+
 -- check if a given file has an image extension (as specified by the
 -- imageExtensions table)
 function isImage(filename)
@@ -88,17 +144,16 @@ function overlayNewImage()
 end
 
 --== input ===================================================================--
--- for mouse:
--- button 1 = dragging
--- button 2 = rotating
--- button 3 scroll = scaling
--- button 3 press = save
 
 function love.mousepressed(x, y, button)
     print("mouse pressed", button)
+    
+    -- begin dragging
     if button == 1 then
         dragging = true
         mouseOriginalPosition = {x = x, y = y}
+
+    -- begin rotating
     elseif button == 2 then
         rotating = true
         mouseRotationOrigin = math.atan((translation.y - mouseDragged.y + baseCenter.y - y) / 
@@ -106,42 +161,28 @@ function love.mousepressed(x, y, button)
         if x < (translation.x - mouseDragged.x + baseCenter.x) then
             mouseRotationOrigin = mouseRotationOrigin + math.pi
         end
+
+    -- save the new layer
     elseif button == 3 then
         print("saving...")
-        -- TODO: translate transformations into an imagemagick command
---[[
-NOTE TO SELF: how to composite with imagemagick
 
-convert -size [FINAL IMAGE SIZE] xc:white \
-    \( 1.jpg -alpha on -channel a -evaluate set [LAYER_TRANSPARENCY] -background transparent -rotate [DEG] \) -gravity center -geometry [OFFSET] -composite \
-    \( 2.jpg -alpha on -channel a -evaluate set [LAYER_TRANSPARENCY] -background transparent -rotate [DEG] \) -gravity center -geometry [OFFSET] -composite \
-    \( 3.jpg -alpha on -channel a -evaluate set [LAYER_TRANSPARENCY] -background transparent -rotate [DEG] \) -gravity center -geometry [OFFSET] -composite \
-    out.jpg
+        appendLayer(overlayPath, actualTranslation.x, actualTranslation.y, degreesRotation, scale)
 
-where
-    DEG = rotation
-    OFFSET = "+"..translation.x.."+"..translation.y
-
-ex
-rm -f out.jpg
-convert -size 620x372 xc:none \
-    \( c.jpg \) -composite \
-    \( c.jpg -alpha on -channel a -evaluate set 50% -background transparent -rotate 15 \) -gravity center -geometry +100+100 -composite \
-    out.jpg
-feh out.jpg
---]]
-        print("saved")
-        if #images > 1 then
+        -- load next image or exit
+        if #images > 0 then
             overlayNewImage()
             collectgarbage("collect")
         else
             print("\nno images left")
+            convertString = convertString.."\n    out.jpg"
+            print("final command: \n"..convertString)
             love.event.push("quit")
         end
     end
 end
 
 function love.mousemoved(x, y, button)
+
     if dragging then
         mouseDragged = {
             x = -(mouseOriginalPosition.x - x),
@@ -149,6 +190,7 @@ function love.mousemoved(x, y, button)
         }
         print("mouse dragging", mouseDragged.x, mouseDragged.y, button)
     end
+
     -- not elseif because a user could be dragging and rotating at the same time
     if rotating then
         mouseRotated = math.atan((translation.y - mouseDragged.y + baseCenter.y - y) / 
@@ -159,10 +201,13 @@ function love.mousemoved(x, y, button)
         mouseRotated = -(mouseRotationOrigin - mouseRotated)
         print("mouse rotating", mouseRotated)
     end
+
 end
 
 function love.mousereleased(x, y, button)
     print("mouse released", button)
+
+    -- save drag
     if button == 1 then
         print("total drag", mouseDragged.x, mouseDragged.y)
         dragging = false
@@ -172,6 +217,8 @@ function love.mousereleased(x, y, button)
         }
         print("new translation", translation.x, translation.y)
         mouseDragged = {x = 0, y = 0}
+
+    -- save rotate
     elseif button == 2 then
         print("total rotation", mouseRotated)
         rotating = false
@@ -226,8 +273,31 @@ function love.load(args)
     end
     print("loaded "..#images.." images")
 
-    baseImage = imageFromPath(table.remove(images, 1))
+    -- check if imagemagick is available. os.execute doesn't seem to be
+    -- returning anything, and neither is io.popen, so a temp file hack has to
+    -- be used.
+    imageMagickStatus = "/tmp/superimposer-imageMagickStatus.temp"
+    os.execute("command -v convert > "..imageMagickStatus)
+    imageMagickStatusFile = io.open(imageMagickStatus,"r")
+    if string.len(imageMagickStatusFile:read("*all")) == 0 then
+        print("\nWARNING: imageMagick not available.")
+    else
+        hasImageMagick = true
+    end
+    imageMagickStatusFile:close()
+    os.execute("rm "..imageMagickStatus)
+
+    -- transparency is determined by the number of images
+    convertString = "LAYER_TRANSPARENCY="..(math.floor(1/#images*100)).."\n\n"..convertString
+
+    basePath = table.remove(images, 1)
+    baseImage = imageFromPath(basePath)
     setBaseScale()
+    
+    convertString = convertString.." -size "..baseImage:getWidth().."x"..
+                                             baseImage:getHeight().." "..
+                                   "xc:white \\"
+
     overlayNewImage()
 end
 
@@ -236,6 +306,12 @@ function love.draw()
     local y = translation.y + mouseDragged.y
     local rot = rotation + mouseRotated
     local sc = scale * baseScale
+
+    actualTranslation = {
+        x = math.floor(x / baseScale),
+        y = math.floor(y / baseScale),
+    }
+    degreesRotation = math.floor(math.deg(rot))
 
     -- base image
     love.graphics.setColor(255, 255, 255, 255)
@@ -258,5 +334,5 @@ function love.draw()
     love.graphics.setColor(0, 0, 0, 150)
     love.graphics.rectangle("fill", 0, 0, windowWidth, 22)
     love.graphics.setColor(255, 255, 255, 255)
-    love.graphics.print("translation: "..math.floor(x / baseScale)..", "..math.floor(y / baseScale).." pixels  |  rotation: "..rot.." radians  |  scale: "..(scale * 100).."%  |  overlay: "..overlayPath, 5, 5)
+    love.graphics.print("translation: "..actualTranslation.x..", "..actualTranslation.y.." pixels  |  rotation: "..degreesRotation.." degrees  |  scale: "..(scale * 100).."%  |  overlay: "..overlayPath, 5, 5)
 end
