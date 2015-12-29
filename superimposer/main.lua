@@ -1,5 +1,9 @@
 -- usage: love . /path/to/images/*.jpg
 
+-- TODO:
+-- possibly rework the rotation mechanism so the controls are more similar to
+-- gimp's controls
+
 -- config
 imageExtensions = {
     "jpg",
@@ -8,11 +12,17 @@ imageExtensions = {
 rotationSensitivity = 0.005
 scaleSensitivity = 0.01
 
--- image properties
 images = {}
 baseImage = nil
+baseScale = 1 -- only used internally to make the baseImage fill the window
+convertString = ""
+windowWidth = 0
+windowHeight = 0
+
+-- overlay image properties
 overlayImage = nil
-position = {x = 0, y = 0}
+overlayPath = nil
+translation = {x = 0, y = 0}
 rotation =  0
 scale = 1
 
@@ -25,7 +35,7 @@ rotating = false
 mouseRotationOrigin = 0
 mouseRotated = 0
 
---== functions ==============================================================---
+--== functions ===============================================================--
 -- check if a given file has an image extension (as specified by the
 -- imageExtensions table)
 function isImage(filename)
@@ -47,7 +57,22 @@ function imageFromPath(path)
     return imageObject
 end
 
---== input ==================================================================---
+-- overlay a new image and reset the variables
+function overlayNewImage()
+    overlayPath = table.remove(images,1)
+    overlayImage = imageFromPath(overlayPath)
+    translation = {x = 0, y = 0}
+    rotation =  0
+    scale = 1
+end
+
+--== input ===================================================================--
+-- for mouse:
+-- button 1 = dragging
+-- button 2 = rotating
+-- button 3 scroll = scaling
+-- button 3 press = save
+
 function love.mousepressed(x, y, button)
     print("mouse pressed", button)
     if button == 1 then
@@ -56,6 +81,38 @@ function love.mousepressed(x, y, button)
     elseif button == 2 then
         rotating = true
         mouseRotationOrigin = x
+    elseif button == 3 then
+        print("saving...")
+        -- TODO: translate transformations into an imagemagick command
+--[[
+NOTE TO SELF: how to composite with imagemagick
+
+convert -size [FINAL IMAGE SIZE] xc:white \
+    \( 1.jpg -alpha on -channel a -evaluate set [LAYER_TRANSPARENCY] -background transparent -rotate [DEG] \) -gravity center -geometry [OFFSET] -composite \
+    \( 2.jpg -alpha on -channel a -evaluate set [LAYER_TRANSPARENCY] -background transparent -rotate [DEG] \) -gravity center -geometry [OFFSET] -composite \
+    \( 3.jpg -alpha on -channel a -evaluate set [LAYER_TRANSPARENCY] -background transparent -rotate [DEG] \) -gravity center -geometry [OFFSET] -composite \
+    out.jpg
+
+where
+    DEG = rotation
+    OFFSET = "+"..translation.x.."+"..translation.y
+
+ex
+rm -f out.jpg
+convert -size 620x372 xc:none \
+    \( c.jpg \) -composite \
+    \( c.jpg -alpha on -channel a -evaluate set 50% -background transparent -rotate 15 \) -gravity center -geometry +100+100 -composite \
+    out.jpg
+feh out.jpg
+--]]
+        print("saved")
+        if #images > 1 then
+            overlayNewImage()
+            collectgarbage("collect")
+        else
+            print("\nno images left")
+            love.event.push("quit")
+        end
     end
 end
 
@@ -79,11 +136,11 @@ function love.mousereleased(x, y, button)
     if button == 1 then
         print("total drag", mouseDragged.x, mouseDragged.y)
         dragging = false
-        position = {
-            x = position.x + mouseDragged.x,
-            y = position.y + mouseDragged.y
+        translation = {
+            x = translation.x + mouseDragged.x,
+            y = translation.y + mouseDragged.y
         }
-        print("new position", position.x, position.y)
+        print("new translation", translation.x, translation.y)
         mouseDragged = {x = 0, y = 0}
     elseif button == 2 then
         print("total rotation", mouseRotated)
@@ -99,7 +156,7 @@ function love.wheelmoved(x, y)
     scale = scale + (y * scaleSensitivity)
 end
 
---===========================================================================---
+--============================================================================--
 function love.load(args)
     -- parse arguments for valid images and add them to the images table
     for index, arg in pairs(args) do
@@ -112,7 +169,9 @@ function love.load(args)
 
     -- quit if there's not enough images
     if #images < 2 then
-        print("\nERROR: not enough images provided.")
+        print("\nERROR: not enough valid images provided.")
+        print("usage: love superimposer /path/to/image1.jpg /path/to/image2.jpg")
+        print("valid image types: jpg, png")
         love.event.push("quit")
         return
     end
@@ -124,21 +183,44 @@ function love.load(args)
     end
 
     baseImage = imageFromPath(table.remove(images, 1))
+
+    -- set the baseScale
+    windowWidth, windowHeight = love.graphics.getDimensions()
+    local widthProportion = windowWidth/baseImage:getWidth()
+    local heightProportion = windowHeight/baseImage:getHeight()
+    if widthProportion < heightProportion then
+        baseScale = widthProportion
+    else
+        baseScale = heightProportion
+    end
+
+    -- overlay the first image
+    overlayNewImage()
 end
 
 function love.draw()
-    if not overlayImage then
-        overlayImage = imageFromPath(table.remove(images, 1))
-    end
-    love.graphics.draw(baseImage)
-    -- TODO: use position as the center of the image instead of the corner.
-    -- currently, the image rotates around position.x and position.y, and
-    -- because they're at the corner, the image rotates like a hinge.
+    local x = translation.x + mouseDragged.x
+    local y = translation.y + mouseDragged.y
+    local rot = rotation + mouseRotated
+    local sc = scale * baseScale
+
+    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.draw(baseImage, 0, 0, 0, baseScale, baseScale)
+
+    love.graphics.setColor(255, 255, 255, 150)
     love.graphics.draw(
         overlayImage,
-        position.x + mouseDragged.x,
-        position.y + mouseDragged.y,
-        rotation + mouseRotated,
-        scale, scale
+        x + baseImage:getWidth() * baseScale / 2,
+        y + baseImage:getHeight() * baseScale / 2,
+        rot,
+        sc,
+        sc,
+        overlayImage:getWidth()/2,
+        overlayImage:getHeight()/2
     )
+
+    love.graphics.setColor(0, 0, 0, 150)
+    love.graphics.rectangle("fill", 0, 0, windowWidth, 22)
+    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.print("translation: "..math.floor(x / baseScale)..","..math.floor(y / baseScale).." pixels  |  rotation: "..rot.." radians  |  scale: "..(scale * 100).."%  |  path: "..overlayPath, 5, 5)
 end
