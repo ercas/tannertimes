@@ -20,4 +20,14 @@ parse.sh is a script to parse the data and generate graphs from responses in the
 
 superimposer
 ------------
-wip tool to make it easy to superimpose large quantities of images
+love2d frontend for compositing images with imagemagick's convert tool
+
+**dependencies**: love, imagemagick
+
+**usage**: love superimposer/ /path/to/image1.jpg /path/to/image2.png ...
+
+this will open a window where image1 serves as the base image and the other images are overlaid on top of it, one by one. left mouse drags, right mouse rotates, scroll wheel scales, middle click moves on to the next image.
+
+the program quits when there are no images left and generates a script called superimposer.sh. superimposer.sh contains the commands needed to composite the images as specified during the gui usage.
+
+![demo image](README-images/superimposer.gif)
