@@ -5,7 +5,7 @@ imageExtensions = {
     "jpg",
     "png",
 }
-rotationSensitivity = 0.01
+rotationSensitivity = 0.005
 scaleSensitivity = 0.01
 
 -- image properties
@@ -131,6 +131,9 @@ function love.draw()
         overlayImage = imageFromPath(table.remove(images, 1))
     end
     love.graphics.draw(baseImage)
+    -- TODO: use position as the center of the image instead of the corner.
+    -- currently, the image rotates around position.x and position.y, and
+    -- because they're at the corner, the image rotates like a hinge.
     love.graphics.draw(
         overlayImage,
         position.x + mouseDragged.x,
