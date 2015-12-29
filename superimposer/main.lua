@@ -17,6 +17,7 @@ scaleSensitivity = 0.01
 -- misc
 images = {}
 baseImage = nil
+baseCenter = {x = 0, y = 0}
 baseScale = 1 -- only used internally to make the baseImage fill the window
 convertString = ""
 windowWidth = 0
@@ -71,6 +72,10 @@ function setBaseScale()
     else
         baseScale = heightProportion
     end
+    baseCenter = {
+        x = baseImage:getWidth() * baseScale / 2,
+        y = baseImage:getHeight() * baseScale / 2
+    }
 end
 
 -- overlay a new image and reset the variables
@@ -96,7 +101,11 @@ function love.mousepressed(x, y, button)
         mouseOriginalPosition = {x = x, y = y}
     elseif button == 2 then
         rotating = true
-        mouseRotationOrigin = x
+        mouseRotationOrigin = math.atan((translation.y - mouseDragged.y + baseCenter.y - y) / 
+                                 (translation.x - mouseDragged.x + baseCenter.x - x))
+        if x < (translation.x - mouseDragged.x + baseCenter.x) then
+            mouseRotationOrigin = mouseRotationOrigin + math.pi
+        end
     elseif button == 3 then
         print("saving...")
         -- TODO: translate transformations into an imagemagick command
@@ -142,7 +151,12 @@ function love.mousemoved(x, y, button)
     end
     -- not elseif because a user could be dragging and rotating at the same time
     if rotating then
-        mouseRotated = (mouseRotationOrigin - x) * rotationSensitivity
+        mouseRotated = math.atan((translation.y - mouseDragged.y + baseCenter.y - y) / 
+                                 (translation.x - mouseDragged.x + baseCenter.x - x))
+        if x < (translation.x - mouseDragged.x + baseCenter.x) then
+            mouseRotated = mouseRotated + math.pi
+        end
+        mouseRotated = -(mouseRotationOrigin - mouseRotated)
         print("mouse rotating", mouseRotated)
     end
 end
@@ -162,6 +176,11 @@ function love.mousereleased(x, y, button)
         print("total rotation", mouseRotated)
         rotating = false
         rotation = rotation + mouseRotated
+        if rotation > (math.pi * 2) then
+            rotation = rotation - (math.pi * 2)
+        elseif rotation < 0 then
+            rotation = rotation  + (math.pi * 2)
+        end
         print("new rotation", rotation)
         mouseRotated = 0
     end
@@ -170,6 +189,9 @@ end
 function love.wheelmoved(x, y)
     print("scroll", x, y)
     scale = scale + (y * scaleSensitivity)
+    if scale < 0 then
+        scale = 0
+    end
 end
 
 --== other events ============================================================--
@@ -223,8 +245,8 @@ function love.draw()
     love.graphics.setColor(255, 255, 255, 150)
     love.graphics.draw(
         overlayImage,
-        x + baseImage:getWidth() * baseScale / 2,
-        y + baseImage:getHeight() * baseScale / 2,
+        x + baseCenter.x,
+        y + baseCenter.y,
         rot,
         sc,
         sc,
