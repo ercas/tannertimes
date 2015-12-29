@@ -13,6 +13,9 @@ imageExtensions = {
 }
 rotationSensitivity = 0.005
 scaleSensitivity = 0.01
+verbose = false
+outputScript = "superimpose.sh"
+outputImage = "superimposed.png"
 
 -- misc
 images = {}
@@ -50,26 +53,14 @@ mouseRotated = 0
 --== functions ===============================================================--
 -- append a new layer to convertString
 --[[
-    NOTE TO SELF: how to composite with imagemagick
+    how to composite with imagemagick:
 
-    convert -size [FINAL IMAGE SIZE] xc:white \
-        \( 1.jpg -alpha on -channel a -evaluate set [LAYER_TRANSPARENCY] -background transparent -rotate [DEG] \) -gravity center -geometry [OFFSET] -composite \
-        \( 2.jpg -alpha on -channel a -evaluate set [LAYER_TRANSPARENCY] -background transparent -rotate [DEG] \) -gravity center -geometry [OFFSET] -composite \
+    convert -size [FINAL IMAGE SIZE] xc:none \
+        \( 1.jpg -alpha on -channel a -evaluate set [LAYER_TRANSPARENCY] -background transparent -rotate [DEG] -scale [SCALE]% \) -gravity center -geometry [OFFSET] -composite \
+        \( 2.jpg -alpha on -channel a -evaluate set [LAYER_TRANSPARENCY] -background transparent -rotate [DEG] -scale [SCALE]% \) -gravity center -geometry [OFFSET] -composite \
         out.jpg
-
-    where
-        DEG = rotation
-        OFFSET = "+"..translation.x.."+"..translation.y
-
-    ex
-    rm -f out.jpg
-    convert -size 620x372 xc:none \
-        \( c.jpg \) -composite \
-        \( c.jpg -alpha on -channel a -evaluate set 50% -background transparent -rotate 15 \) -gravity center -geometry +100+100 -composite \
-        out.jpg
-    feh out.jpg
 --]]
-function appendLayer(path, x, y, rot, scale)
+function appendLayer(path, x, y, rot, scale, transparency)
     local xSign, ySign, layerString
     if x >= 0 then
         xSign = "+"
@@ -81,9 +72,12 @@ function appendLayer(path, x, y, rot, scale)
     else
         ySign = ""
     end
+    if not transparency then
+        transparency = "$LAYER_TRANSPARENCY"
+    end
     layerString = "\n    \\( '"..
                       path.."' -alpha on -channel a "..
-                      "-evaluate set $LAYER_TRANSPARENCY% "..
+                      "-evaluate set "..transparency.."% "..
                       "-background transparent "..
                       "-rotate "..rot.." "..
                       "-scale "..math.floor(scale*100).."% "..
@@ -93,7 +87,14 @@ function appendLayer(path, x, y, rot, scale)
                                 ySign..y.." "..
                   "-composite \\"
     convertString = convertString..layerString
-    print("appended "..layerString)
+    echo("appended "..layerString)
+end
+
+-- wrapper for print
+function echo(str)
+    if verbose then
+        print(str)
+    end
 end
 
 -- check if a given file has an image extension (as specified by the
@@ -109,6 +110,7 @@ end
 -- return an Image object, given the absolute filesystem path to an image file.
 -- could be smushed into a one liner, but open source is about learning, right?
 function imageFromPath(path)
+    echo("opening "..path)
     local file = io.open(path)
     local imageDataRaw = file:read("*all")
     file:close()
@@ -146,7 +148,7 @@ end
 --== input ===================================================================--
 
 function love.mousepressed(x, y, button)
-    print("mouse pressed", button)
+    echo("mouse pressed", button)
     
     -- begin dragging
     if button == 1 then
@@ -164,7 +166,7 @@ function love.mousepressed(x, y, button)
 
     -- save the new layer
     elseif button == 3 then
-        print("saving...")
+        echo("saving...")
 
         appendLayer(overlayPath, actualTranslation.x, actualTranslation.y, degreesRotation, scale)
 
@@ -174,8 +176,32 @@ function love.mousepressed(x, y, button)
             collectgarbage("collect")
         else
             print("\nno images left")
-            convertString = convertString.."\n    out.jpg"
-            print("final command: \n"..convertString)
+
+            -- add final touches to convertString and turn it into a standalone
+            -- shell script
+            convertString = "\n\n#!/usr/bin/env/sh "..
+                            "\n# generated with superimposer"..
+                            "\n\n"..convertString..
+                            "\n    "..outputImage.." && \\"..
+                            "\necho 'wrote composited image to "..outputImage.."' || \\"..
+                            "\necho 'error compositing images'"
+            echo("final script: "..convertString)
+            
+            -- write convertString to a file and make it executable
+            local newFile = io.open(outputScript,"w")
+            newFile:write(convertString)
+            newFile:close()
+            os.execute("chmod +x "..outputScript)
+
+            print("\nwrote script to "..outputScript)
+            print("to use: sh superimpose.sh OR ./superimpose.sh")
+            print("\nchange the LAYER_TRANSPARENCY variable in that script if you need more or")
+            print("less transparent layers.")
+            if not hasImageMagick then
+                print("\nWARNING: this script needs ImageMagick installed to run.")
+                print("you can download ImageMagick at http://www.imagemagick.org/script/index.php")
+                print("this program should also be available in your distribution's repository.")
+            end
             love.event.push("quit")
         end
     end
@@ -188,7 +214,7 @@ function love.mousemoved(x, y, button)
             x = -(mouseOriginalPosition.x - x),
             y = -(mouseOriginalPosition.y - y)
         }
-        print("mouse dragging", mouseDragged.x, mouseDragged.y, button)
+        echo("mouse dragging", mouseDragged.x, mouseDragged.y, button)
     end
 
     -- not elseif because a user could be dragging and rotating at the same time
@@ -199,28 +225,28 @@ function love.mousemoved(x, y, button)
             mouseRotated = mouseRotated + math.pi
         end
         mouseRotated = -(mouseRotationOrigin - mouseRotated)
-        print("mouse rotating", mouseRotated)
+        echo("mouse rotating", mouseRotated)
     end
 
 end
 
 function love.mousereleased(x, y, button)
-    print("mouse released", button)
+    echo("mouse released", button)
 
     -- save drag
     if button == 1 then
-        print("total drag", mouseDragged.x, mouseDragged.y)
+        echo("total drag", mouseDragged.x, mouseDragged.y)
         dragging = false
         translation = {
             x = translation.x + mouseDragged.x,
             y = translation.y + mouseDragged.y
         }
-        print("new translation", translation.x, translation.y)
+        echo("new translation", translation.x, translation.y)
         mouseDragged = {x = 0, y = 0}
 
     -- save rotate
     elseif button == 2 then
-        print("total rotation", mouseRotated)
+        echo("total rotation", mouseRotated)
         rotating = false
         rotation = rotation + mouseRotated
         if rotation > (math.pi * 2) then
@@ -228,13 +254,13 @@ function love.mousereleased(x, y, button)
         elseif rotation < 0 then
             rotation = rotation  + (math.pi * 2)
         end
-        print("new rotation", rotation)
+        echo("new rotation", rotation)
         mouseRotated = 0
     end
 end
 
 function love.wheelmoved(x, y)
-    print("scroll", x, y)
+    echo("scroll", x, y)
     scale = scale + (y * scaleSensitivity)
     if scale < 0 then
         scale = 0
@@ -253,7 +279,7 @@ function love.load(args)
         if isImage(arg) then
             table.insert(images,arg)
         else
-            print(arg.." is not an image and has been ignored.")
+            print(arg.." is not a valid image and has been ignored.")
         end
     end
 
@@ -267,11 +293,11 @@ function love.load(args)
     end
 
     -- list images for debug purposes
-    print("index", "value")
+    echo("index", "value")
     for index, value in pairs(images) do
-        print(index, value)
+        echo(index, value)
     end
-    print("loaded "..#images.." images")
+    echo("loaded "..#images.." images")
 
     -- check if imagemagick is available. os.execute doesn't seem to be
     -- returning anything, and neither is io.popen, so a temp file hack has to
@@ -287,16 +313,18 @@ function love.load(args)
     imageMagickStatusFile:close()
     os.execute("rm "..imageMagickStatus)
 
-    -- transparency is determined by the number of images
-    convertString = "LAYER_TRANSPARENCY="..(math.floor(1/#images*100)).."\n\n"..convertString
-
     basePath = table.remove(images, 1)
     baseImage = imageFromPath(basePath)
     setBaseScale()
     
-    convertString = convertString.." -size "..baseImage:getWidth().."x"..
-                                             baseImage:getHeight().." "..
-                                   "xc:white \\"
+    -- generate the rest of convertString, minus layers and output image
+    convertString = "LAYER_TRANSPARENCY=50"..
+                    "\nMAGICK_TMPDIR=$HOME"..
+                    "\n\n"..convertString.." "..
+                    "-size "..baseImage:getWidth().."x"..baseImage:getHeight().." "..
+                    "xc:none \\"..
+                    "\n    -limit memory 128M -limit map 256M \\"
+    appendLayer(basePath, 0, 0, 0, 1, 100)
 
     overlayNewImage()
 end
