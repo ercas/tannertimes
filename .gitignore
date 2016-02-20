@@ -1,3 +1,6 @@
 avibench/responses/*
 avibench/data/*
 avibench/graphs/*
+songsoftheweek/config/*
+songsofthweek/output/*
+songsoftheweek/xml
