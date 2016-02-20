@@ -7,7 +7,7 @@ output=output/songtags.dsv
 archive_xml_dir=xml # save all xml data to a directory. leave blank to avoid
 
 get_tags="$(dirname "$0")/getsongtags.sh"
-song_dsv="$(dirname "$0")/songsoftheweek.dsv"
+song_dsv="$(dirname "$0")/output/songsoftheweek.dsv"
 
 ! [ -f "$get_tags" ] && echo "error: could not find getsongtags.sh" && exit 1
 ! [ -f "$song_dsv" ] && echo "error: could not find songsoftheweek.dsv" && exit 1

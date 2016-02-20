@@ -25,9 +25,9 @@ tools to grab and analyze data concerning songs of the week articles. the last.f
 **dependencies**: wget, GNU grep, r with extrafont package, phantom.js, w3m
 
 **directory info**
-* config/ - a directory to store runtime data in. this should contain api_key.txt (containing a last.fm api key) and articles.txt (containing a list of all articles, separated by newlines)
+* config/ - a directory to store runtime data in. this should contain api\_key.txt (containing a last.fm api key) and articles.txt (containing a list of all articles, separated by newlines)
 * output/ - this is where output from scripts will be stored. other scripts access this directory to process the output from previous scripts.
-* xml/ - this may or may not exist depending on if the $archive_xml_dir variable is set in getalltags.sh. if so, this is a cache of downloaded last.fm api data to prevent api overuse from multiple runs.
+* xml/ - this may or may not exist depending on if the $archive\_xml\_dir variable is set in getalltags.sh. if so, this is a cache of downloaded last.fm api data to prevent api overuse from multiple runs.
 
 **script info**
 ordered according to which scripts should run first:
@@ -35,7 +35,9 @@ ordered according to which scripts should run first:
 * getsongtags.sh - a small wrapper script to fetch last.fm api data, given an artist and song title. this is not used directly; rather, it is used by getalltags.sh.
 * getalltags.sh - parse output/songsoftheweek.dsv and feed information to getsongtags.sh to generate songtags.dsv (delimited by "@"), containing track and tag data.
 * gentagcsv.sh - parse output/songtags.dsv to create a sorted list of tag frequencies, stored at output/tagcount.csv.
-* graphtagcount.r - parse output/tagcount.csv to create a pie chart, output/tagcount.png.
+* graphtagcount.r - parse output/tagcount.csv to create a pie chart, output/tagcount-pie.png, and a bar chart, output/tagcount-top10-bar.png.
+* gencontributorcsv - parse output/songsoftheweek.dsv to create a sorted list of contributors, stored output/contributorcount.csv
+* graphcontributors.r - parse output/contributorcount.csv to create a bar chart, output/contributorcount-top10-bar.png
 
 superimposer
 ------------

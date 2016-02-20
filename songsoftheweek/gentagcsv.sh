@@ -6,9 +6,9 @@ songtags=output/songtags.dsv
 output=output/tagcount.csv
 
 other_count=0
-threshold=7 # minimum count needed to avoid being categorized as "other"
+threshold=4 # minimum count needed to avoid being categorized as "other"
 # regex of tags to be automatically categorized as "other"
-exclude="[0-9]+s|beautiful|british|femalevocalists|love|oldies|soundtrack"
+exclude="[0-9]+s|beautiful|british|chill|cover|epic|femalevocalists|love|mellow|oldies|rap|soundtrack"
 
 echo "COUNT,TAG" > "$output"
 
