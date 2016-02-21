@@ -16,5 +16,4 @@ function error() {
 [ -z "$artist" ] && error "no artist"
 [ -z "$track" ] && error "no track"
 
-wget -qO - "https://ws.audioscrobbler.com/2.0/?method=track.getinfo&api_key=$api_key&artist=$artist&track=$track" | \
-    sed -n "/<tag>/,/<\/tag>/p" | grep -oP "(?<=\<name\>).*(?=\</name\>)"
+wget -qO - "https://ws.audioscrobbler.com/2.0/?method=track.getinfo&api_key=$api_key&artist=$artist&track=$track"    

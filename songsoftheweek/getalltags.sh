@@ -6,12 +6,16 @@ delay=1 # how long to wait between each api request
 output=output/songtags.dsv
 archive_xml_dir=xml # save all xml data to a directory. leave blank to avoid
 
-get_tags="$(dirname "$0")/getsongtags.sh"
+get_info="$(dirname "$0")/getsonginfo.sh"
 song_dsv="$(dirname "$0")/output/songsoftheweek.dsv"
 
-! [ -f "$get_tags" ] && echo "error: could not find getsongtags.sh" && exit 1
+! [ -f "$get_info" ] && echo "error: could not find getsonginfo.sh" && exit 1
 ! [ -f "$song_dsv" ] && echo "error: could not find songsoftheweek.dsv" && exit 1
 ! [ -z "$archive_xml_dir" ] && mkdir -p "$archive_xml_dir"
+
+function extract_tags() {
+    cat "$1" | sed -n "/<tag>/,/<\/tag>/p" | grep -oP "(?<=\<name\>).*(?=\</name\>)"
+}
 
 echo "ARTIST${delimiter}SONG${delimiter}TAGS" > "$output"
 tail -n +2 "$song_dsv" | while read line; do
@@ -20,14 +24,15 @@ tail -n +2 "$song_dsv" | while read line; do
 
     skip=false
     if [ -z "$archive_xml_dir" ]; then
-        raw_tags="$("$get_tags" "$artist" "$song")"
+        raw_tags="$(extract_tags <("$get_info" "$artist" "$song"))"
     else
         outfile="$archive_xml_dir/$(tr "/" "_" <<< "$artist - $song").xml"
         if [ -f "$outfile" ]; then
-            raw_tags="$(cat "$outfile")"
+            raw_tags="$(extract_tags "$outfile")"
             skip=true
         else
-            raw_tags="$("$get_tags" "$artist" "$song" | tee "$outfile")"
+            "$get_info" "$artist" "$song" > "$outfile"
+            raw_tags="$(extract_tags "$outfile")"
         fi
         if [ -z "$raw_tags" ]; then
             rm "$outfile"
