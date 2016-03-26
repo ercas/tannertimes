@@ -32,11 +32,12 @@ tools to grab and analyze data concerning songs of the week articles. the last.f
 **script info**
 ordered according to which scripts should run first:
 * ripsongsoftheweek.sh - download the raw html of all links, run the scripts and let the page render using phantom.js, render the resulting html with w3m, and save parsed contributor information to output/songsoftheweek.dsv (delimited by "@").
+* ripcontributor.sh - similar to ripsongsoftheweek.sh, saves all contributions by a single contributor to a text file in output/.
 * getsonginfo.sh - a small wrapper script to fetch last.fm api data, given an artist and song title. this is not used directly; rather, it is used by getalltags.sh.
 * getalltags.sh - parse output/songsoftheweek.dsv and feed information to getsonginfo.sh to generate songtags.dsv (delimited by "@"), containing track and tag data.
 * gentagcsv.sh - parse output/songtags.dsv to create a sorted list of tag frequencies, stored at output/tagcount.csv.
 * graphtagcount.r - parse output/tagcount.csv to create a pie chart, output/tagcount-pie.png, and a bar chart, output/tagcount-top10-bar.png.
-* gencontributorcsv - parse output/songsoftheweek.dsv to create a sorted list of contributors, stored output/contributorcount.csv
+* gencontributorcsv.sh - parse output/songsoftheweek.dsv to create a sorted list of contributors, stored output/contributorcount.csv
 * graphcontributors.r - parse output/contributorcount.csv to create a bar chart, output/contributorcount-top10-bar.png
 
 superimposer
