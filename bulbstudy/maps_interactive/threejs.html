@@ -1,0 +1,204 @@
+<html>
+    <head>
+        <title>PVMHS 3D Light Intensity Map</title>
+        <style>
+            body {
+                font-family: sans-serif;
+            }
+            canvas {
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index: -1
+            }
+            #render {
+                width: 100%;
+                height: 400px;
+                position: relative;
+            }
+            .button {
+                border-radius: 8px;
+                border-width: 2px;
+                border-style: solid;
+                cursor: pointer;
+                display: inline-block;
+                padding: 5px;
+                margin: 3px;
+            }
+            .active {
+                background-color: #92E9E9;
+                border-color: #005858;
+                color: #005858;
+            }
+            .inactive {
+                background-color: #bbbbbb;
+                border-color: #171717;
+                color: #171717;
+            }
+        </style>
+    </head>
+    <body>
+        <div id=render>
+            <div id=switch-position class="button active" onclick=changeCamera()>
+                Change Camera
+            </div>
+            <div id=toggle-rotate class="button active" onclick=toggleRotation()>
+                Rotate
+            </div>
+            <div id=toggle-first class="button active" onclick=toggleFirst()>
+                First Floor
+            </div>
+            <div id=toggle-second class="button active" onclick=toggleSecond()>
+                Second Floor
+            </div>
+            <div id=toggle-third class="button active" onclick=toggleThird()>
+                Third Floor
+            </div>
+            <img src=logo.png style="height: 10%; right: 0; bottom: 0; position: absolute;"></img>
+            <img src=key.png style="height: 60%; left: 0; bottom: 0; position: absolute;"></img>
+            <div style="font-size: 12; right: 0; bottom: 12%; position: absolute;">ground image courtesy of <a href=http://openstreetmap.org/>OpenStreetMap</a></div>
+        </div>
+        <script src="three.min.js"></script>
+        <script>
+            // config
+            var renderDiv = document.getElementById("render");
+            var width = renderDiv.offsetWidth;
+            var height = renderDiv.offsetHeight;
+
+            // setup
+            var scene = new THREE.Scene();
+            scene.fog = new THREE.Fog(0xdefbff, 1.75, 2.5);
+            var camera = new THREE.PerspectiveCamera(90,
+                    width/height);
+            var renderer = new THREE.WebGLRenderer({alpha: true});
+            renderer.setClearColor(0xdefbff);
+            renderer.setSize(width, height);
+            renderDiv.appendChild(renderer.domElement);
+             window.onresize = function() {
+                 renderer.setSize(renderDiv.offsetWidth, renderDiv.offsetHeight);
+                 camera.aspect = (renderDiv.offsetWidth/renderDiv.offsetHeight);
+                 camera.updateProjectionMatrix();
+             };
+
+
+            // function to create a plane from an image
+            function createPlane(image, width, height) {
+                return new THREE.Mesh(
+                    new THREE.PlaneGeometry(width, height),
+                    new THREE.MeshBasicMaterial({
+                        side: THREE.DoubleSide,
+                        map: new THREE.TextureLoader().load(image),
+                        transparent: true
+                    })
+                );
+            };
+
+            // create planes
+            var firstFloor = createPlane("1.png", 1.059, 1.477);
+            scene.add(firstFloor);
+            var secondFloor = createPlane("2.png", 1.059, 1.477);
+            scene.add(secondFloor);
+            var thirdFloor = createPlane("3.png", 1.059, 1.477);
+            scene.add(thirdFloor);
+            var ground = createPlane("map.png",7,7);
+            scene.add(ground);
+
+            // positioning
+            firstFloor.rotation.x = 90;
+            secondFloor.rotation.x = 90;
+            secondFloor.position.y = 0.175
+            thirdFloor.rotation.x = 90;
+            thirdFloor.position.y = 0.35
+            ground.rotation.x = 90;
+            ground.rotation.z = -0.56;
+            ground.position.y = -0.01;
+
+            // start rendering
+            var rotatePerFrame = 0.004
+            function render() {
+                requestAnimationFrame(render);
+
+                firstFloor.rotation.z += rotatePerFrame
+                secondFloor.rotation.z += rotatePerFrame
+                thirdFloor.rotation.z += rotatePerFrame
+                ground.rotation.z += rotatePerFrame
+
+                renderer.render(scene, camera);
+            };
+            render();
+
+            // controls ///////////////////////////////////////////////////////
+
+            // camera controls
+            var cameraPositions = [
+                {
+                    x: 0,
+                    y: 0,
+                    z: 1,
+                    rotation: -0.1
+                },
+                {
+                    x: 0,
+                    y: 0.6,
+                    z: 0.9,
+                    rotation: -0.6
+                },
+                {
+                    x: 0,
+                    y: 1.1,
+                    z: 0.7,
+                    rotation: -1
+                }
+            ];
+            var currentPosition = -1;
+            function changeCamera() {
+                currentPosition = (currentPosition + 1) % cameraPositions.length;
+                var position = cameraPositions[currentPosition];
+                camera.position.x = position.x;
+                camera.position.y = position.y;
+                camera.position.z = position.z;
+                camera.rotation.x = position.rotation;
+            }
+            changeCamera();
+
+            // toggle floor visibility
+            var firstButton = document.getElementById("toggle-first")
+            function toggleFirst() {
+                firstFloor.visible = ! firstFloor.visible;
+                if (firstFloor.visible)
+                    firstButton.setAttribute("class","button active");
+                else
+                    firstButton.setAttribute("class","button inactive");
+            }
+            var secondButton = document.getElementById("toggle-second")
+            function toggleSecond() {
+                secondFloor.visible = ! secondFloor.visible;
+                if (secondFloor.visible)
+                    secondButton.setAttribute("class","button active");
+                else
+                    secondButton.setAttribute("class","button inactive");
+            }
+            var thirdButton = document.getElementById("toggle-third")
+            function toggleThird() {
+                thirdFloor.visible = ! thirdFloor.visible;
+                if (thirdFloor.visible)
+                    thirdButton.setAttribute("class","button active");
+                else
+                    thirdButton.setAttribute("class","button inactive");
+            }
+
+            // toggle rotation
+            var defaultRotation = rotatePerFrame;
+            var rotateButton = document.getElementById("toggle-rotate");
+            function toggleRotation() {
+                if (rotatePerFrame == defaultRotation) {
+                    rotatePerFrame = 0;
+                    rotateButton.setAttribute("class","button inactive");
+                } else {
+                    rotatePerFrame = defaultRotation;
+                    rotateButton.setAttribute("class","button active");
+                }
+            }
+        </script>
+    </body>
+</html>

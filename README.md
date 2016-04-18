@@ -18,6 +18,17 @@ a small smartphone browser performance survey suite including a server and data 
 
 parse.sh is a script to parse the data and generates graphs from responses in the responses/ directory, putting them in the graphs/ directory. graphs.php generates a page using these images
 
+bulbstudy
+---------
+data analysis and visualizations for the tanner times lightbulb study
+
+**dependencies** r with extrafont package, GNU or BSD grep, wget, p7zip, libreoffice
+
+data/scrape.sh: scrape energy data from the us energy information administration and filter out the needed tables
+data/parse.sh: parse the output of scrape.sh to create a csv of energy cost over time
+data/gengraphs.r: generate graphs from the output of parse.sh
+maps_interactive/threejs.html: a three.js visualization of the three floors of pvmhs with their corresponding light intensity maps
+
 songsoftheweek
 --------------
 tools to grab and analyze data concerning songs of the week articles. the last.fm api is used to gather individual song data.
