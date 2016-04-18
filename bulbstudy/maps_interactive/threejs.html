@@ -4,6 +4,7 @@
         <style>
             body {
                 font-family: sans-serif;
+                margin: 0;
             }
             canvas {
                 position: absolute;
@@ -13,7 +14,7 @@
             }
             #render {
                 width: 100%;
-                height: 400px;
+                height: 100%;
                 position: relative;
             }
             .button {
@@ -23,12 +24,12 @@
                 cursor: pointer;
                 display: inline-block;
                 padding: 5px;
-                margin: 3px;
+                margin: 5px -5px 0px 5px;
             }
             .active {
-                background-color: #92E9E9;
-                border-color: #005858;
-                color: #005858;
+                background-color: #bad6e1;
+                border-color: #03212b;
+                color: #03212b;
             }
             .inactive {
                 background-color: #bbbbbb;
@@ -58,27 +59,25 @@
             <img src=key.png style="height: 60%; left: 0; bottom: 0; position: absolute;"></img>
             <div style="font-size: 12; right: 0; bottom: 12%; position: absolute;">ground image courtesy of <a href=http://openstreetmap.org/>OpenStreetMap</a></div>
         </div>
-        <script src="three.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r75/three.min.js"></script>
         <script>
             // config
             var renderDiv = document.getElementById("render");
-            var width = renderDiv.offsetWidth;
-            var height = renderDiv.offsetHeight;
 
             // setup
             var scene = new THREE.Scene();
             scene.fog = new THREE.Fog(0xdefbff, 1.75, 2.5);
             var camera = new THREE.PerspectiveCamera(90,
-                    width/height);
+                    window.innerWidth/window.innerHeight);
             var renderer = new THREE.WebGLRenderer({alpha: true});
             renderer.setClearColor(0xdefbff);
-            renderer.setSize(width, height);
+            renderer.setSize(window.innerWidth, window.innerHeight);
             renderDiv.appendChild(renderer.domElement);
-             window.onresize = function() {
-                 renderer.setSize(renderDiv.offsetWidth, renderDiv.offsetHeight);
-                 camera.aspect = (renderDiv.offsetWidth/renderDiv.offsetHeight);
-                 camera.updateProjectionMatrix();
-             };
+            window.onresize = function() {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = (window.innerWidth/window.innerHeight);
+                camera.updateProjectionMatrix();
+            };
 
 
             // function to create a plane from an image
