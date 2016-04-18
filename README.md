@@ -22,12 +22,12 @@ bulbstudy
 ---------
 data analysis and visualizations for the tanner times lightbulb study
 
-**dependencies** r with extrafont package, GNU or BSD grep, wget, p7zip, libreoffice
+**dependencies**: r with extrafont package, GNU or BSD grep, wget, p7zip, libreoffice
 
-data/scrape.sh: scrape energy data from the us energy information administration and filter out the needed tables
-data/parse.sh: parse the output of scrape.sh to create a csv of energy cost over time
-data/gengraphs.r: generate graphs from the output of parse.sh
-maps_interactive/threejs.html: a three.js visualization of the three floors of pvmhs with their corresponding light intensity maps
+* data/scrape.sh: scrape energy data from the us energy information administration and filter out the needed tables
+* data/parse.sh: parse the output of scrape.sh to create a csv of energy cost over time
+* data/gengraphs.r: generate graphs from the output of parse.sh
+* maps_interactive/threejs.html: a three.js visualization of the three floors of pvmhs with their corresponding light intensity maps
 
 songsoftheweek
 --------------
