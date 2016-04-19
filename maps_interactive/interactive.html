@@ -81,25 +81,26 @@
 
 
             // function to create a plane from an image
-            function createPlane(image, width, height) {
+            function createPlane(image, width, height, alphamap) {
                 return new THREE.Mesh(
                     new THREE.PlaneGeometry(width, height),
                     new THREE.MeshBasicMaterial({
                         side: THREE.DoubleSide,
                         map: new THREE.TextureLoader().load(image),
+                        alphaMap: new THREE.TextureLoader().load(alphamap),
                         transparent: true
                     })
                 );
             };
 
             // create planes
-            var firstFloor = createPlane("1.png", 1.059, 1.477);
+            var firstFloor = createPlane("1.jpg", 1.059, 1.477, "1-alpha.jpg");
             scene.add(firstFloor);
-            var secondFloor = createPlane("2.png", 1.059, 1.477);
+            var secondFloor = createPlane("2.jpg", 1.059, 1.477, "2-alpha.jpg");
             scene.add(secondFloor);
-            var thirdFloor = createPlane("3.png", 1.059, 1.477);
+            var thirdFloor = createPlane("3.jpg", 1.059, 1.477, "3-alpha.jpg");
             scene.add(thirdFloor);
-            var ground = createPlane("map.png",7,7);
+            var ground = createPlane("map.png", 7, 7, "map-alpha.jpg");
             scene.add(ground);
 
             // positioning
