@@ -31,7 +31,7 @@ data analysis and visualizations for the tanner times lightbulb study
 
 songsoftheweek
 --------------
-tools to grab and analyze data concerning songs of the week articles. the last.fm api is used to gather individual song data.
+tools to grab and analyze data concerning songs of the week articles. the last.fm api is used to gather individual song data. before running anything, use the setup.sh script to set up.
 
 **dependencies**: wget, GNU grep, r with extrafont package, phantom.js, w3m
 
@@ -42,6 +42,7 @@ tools to grab and analyze data concerning songs of the week articles. the last.f
 
 **script info**
 ordered according to which scripts should run first:
+* setup.sh - set up the directories and config files
 * ripsongsoftheweek.sh - download the raw html of all links, run the scripts and let the page render using phantom.js, render the resulting html with w3m, and save parsed contributor information to output/songsoftheweek.dsv (delimited by "@").
 * ripcontributor.sh - similar to ripsongsoftheweek.sh, saves all contributions by a single contributor to a text file in output/.
 * getsonginfo.sh - a small wrapper script to fetch last.fm api data, given an artist and song title. this is not used directly; rather, it is used by getalltags.sh.
