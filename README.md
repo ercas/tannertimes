@@ -27,6 +27,7 @@ data analysis and visualizations for the tanner times lightbulb study
 * data/scrape.sh: scrape energy data from the us energy information administration and filter out the needed tables
 * data/parse.sh: parse the output of scrape.sh to create a csv of energy cost over time
 * data/gengraphs.r: generate graphs from the output of parse.sh
+* data/combinegraphs.r: generate a combined graph from the output of parse.sh
 * maps_interactive/threejs.html: a three.js visualization of the three floors of pvmhs with their corresponding light intensity maps
 
 songsoftheweek
