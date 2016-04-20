@@ -30,7 +30,7 @@ png(
 plot(
     x=NULL,
     y=NULL,
-    main='Average Residential Electricity Costs from Oct 2010 to Jan 2016',
+    main='Average Electricity Costs from Oct 2010 to Jan 2016',
     xlab="Months since January 2010",
     ylab="Cost (cents per kWh)",
     xlim=range(min(months_since_2010_01):max(months_since_2010_01)),
